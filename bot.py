@@ -1,8 +1,7 @@
 import csv
 import discord
 from discord.ext import commands
-from discord.ext.commands import has_permissions
-from discord.ext.commands import Context
+from discord.ext.commands import *
 import json
 import time
 import os
@@ -128,8 +127,7 @@ async def pick(ctx: Context, arg: str):
 # INVITE COMMAND
 @client.command(name="Invite", description="See the invite link for PikaPi!")
 async def invite(ctx: Context):
-    em = discord.Embed
-    em.description = "https://discord.com/oauth2/authorize?client_id=871051341248737290&scope=bot&permissions=8"
+    em = discord.Embed(description="https://discord.com/oauth2/authorize?client_id=871051341248737290&scope=bot&permissions=8")
     ctx.send(embed=em)
 
 #ready
