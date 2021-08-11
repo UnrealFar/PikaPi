@@ -128,7 +128,7 @@ async def pick(ctx: Context, arg: str):
 @client.command(name="Invite", description="See the invite link for PikaPi!")
 async def invite(ctx: Context):
     em = discord.Embed(description="https://discord.com/oauth2/authorize?client_id=871051341248737290&scope=bot&permissions=8")
-    ctx.send(embed=em)
+    await ctx.send(embed=em)
 
 #ready
 @client.event
