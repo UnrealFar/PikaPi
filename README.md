@@ -10,7 +10,7 @@ This repository ("`PikaPi`") is where we develop the [PikaPi](https://top.gg/ser
 ## PikaPi Alpha
 
 <p align="center">
-  <img alt="Our Bot!" src="https://media.discordapp.net/attachments/872133289375318016/874950183824273418/PikaPi.png?width=50&height=50">
+  <img alt="Our Bot!" src="https://media.discordapp.net/attachments/872133289375318016/874950183824273418/PikaPi.png?width=75&height=75">
 </p>
 
 [PikaPi](https://top.gg/servers/871048037768790016) is a distribution of the `PikaPi` repository with the bot being already available.
