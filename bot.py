@@ -1,9 +1,10 @@
-import discord
-import json
-import time
 import csv
+import discord
 from discord.ext import commands
 from discord.ext.commands import has_permissions
+from discord.ext.commands import Context
+import json
+import time
 import os
 from dotenv import load_dotenv
 load_dotenv()
@@ -14,11 +15,6 @@ def get_prefix(client, message):
     return prefixes[str(message.guild.id)]
 client = commands.Bot(command_prefix=(get_prefix), case_insensitive=True,  activity=discord.Activity(type=discord.ActivityType.watching, name="Loki on Disney+"), status=discord.Status.idle, intents=discord.Intents.all(), description='Best pokemon bot ever!')
 client.remove_command("help")
-
-#ready
-@client.event
-async def on_ready():
-    print(f"{client.user} is ready!")
 
 #setprefix(server admins only)
 @client.event
@@ -128,5 +124,11 @@ async def pick(ctx: Context, arg: str):
             writer.writeheader()
             for user in data["users"]:
                     writer.writerow(dict(USER="ID_"+user, STARTER=data["users"][user]["starter"], POKEMON=data["users"][user]["pokemon"]))
-    
+
+
+#ready
+@client.event
+async def on_ready():
+    print(f"{client.user} is ready!")
+
 client.run(TOKEN)
