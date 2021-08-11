@@ -2,7 +2,7 @@
 
 **Please do not report security vulnerabilities through public GitHub issues.**
 
-Instead, please report them to ModMail in the [Discord server](https://discord.gg/placeholder/).
+Instead, please report them to ModMail in the [Discord server](https://top.gg/servers/871048037768790016).
 
 You should receive a response within 24 hours. If for some reason you do not, please follow up via DM to ensure we received your original message.
 
