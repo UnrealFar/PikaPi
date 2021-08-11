@@ -10,8 +10,8 @@ AS OF NOW, THIS BOT IS STILL BEING DEVELOPED AND IS IN ITS ALPHA PROGRAM!
 	- Battling
 	- Currency
 	- Pokedex
-  - Trading
--OTHERS
+  	- Trading
+- OTHERS
   - Quests
   - Eggs
 
