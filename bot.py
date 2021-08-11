@@ -125,6 +125,12 @@ async def pick(ctx: Context, arg: str):
             for user in data["users"]:
                     writer.writerow(dict(USER="ID_"+user, STARTER=data["users"][user]["starter"], POKEMON=data["users"][user]["pokemon"]))
 
+# INVITE COMMAND
+@client.command(name="Invite", description="See the invite link for PikaPi!")
+async def invite(ctx: Context):
+    em = discord.Embed
+    em.description = "https://discord.com/oauth2/authorize?client_id=871051341248737290&scope=bot&permissions=8"
+    ctx.send(embed=em)
 
 #ready
 @client.event
