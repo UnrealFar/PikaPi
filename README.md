@@ -5,13 +5,15 @@ AS OF NOW, THIS BOT IS STILL BEING DEVELOPED AND IS IN ITS ALPHA PROGRAM!
 -Invite this bot to your server with the p!invite command!
 
 ## Roadmap
--Pokemon(most important)
--Battling
--Pokedex
--Trading
--Currency
--Quests
--Eggs
+- IMPORTANT
+	- Pokemon(most important)
+	- Battling
+	- Currency
+	- Pokedex
+  - Trading
+-OTHERS
+  - Quests
+  - Eggs
 
 ## Contributing
 I'm open to contributions. Please, however, make an issue first if you want to contribute to the bot.
