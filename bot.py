@@ -101,8 +101,6 @@ async def pick(ctx: Context, arg: str):
             json.dump({"pokemon": [],"starters": []}, f)
     with open("pokemon.json", "r+") as f:
         data = json.load(f)
-        print(data)
-        print(data["starters"])
         if arg.lower() not in data["starters"]:
             await ctx.send("This is not a valid starter pokemon!")
             return
