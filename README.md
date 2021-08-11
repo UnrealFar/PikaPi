@@ -1,6 +1,6 @@
 # PikaPi Alpha Discord Bot
 
-[![Feature Requests](https://img.shields.io/github/issues/microsoft/vscode/feature-request.svg)](https://github.com/ThePikaPi/PikaPi/issues?q=is%3Aopen+is%3Aissue+label%3Afeature-request+sort%3Areactions-%2B1-desc)
+[![Feature Requests](https://img.shields.io/github/issues/microsoft/vscode/feature-request.svg)](https://github.com/ThePikaPi/PikaPi/issues?q=is%3Aopen+is%3Aissue+label%3Afeature-request)
 [![Bugs](https://img.shields.io/github/issues/ThePikaPi/PikaPi/bug.svg)](https://github.com/ThePikaPi/PikaPi/issues?utf8=✓&q=is%3Aissue+is%3Aopen+label%3Abug)
 
 ## The Repository
