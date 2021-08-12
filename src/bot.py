@@ -1,40 +1,57 @@
+import json
+import os
+
 import discord
 from discord.ext import commands
 from discord.ext.commands import *
-import json
-#from dotenv import load_dotenv
-#load_dotenv()
-#TOKEN = os.environ['TOKEN']
-def get_prefix(client, message):
-    with open("prefixes.json", "r") as f:
+
+from dotenv import load_dotenv
+load_dotenv()
+
+def get_prefix(bot, message):
+    """Gets the Bot prefix from a file according to the guild the Bot is in."""
+    with open("./src/data/prefixes.json", "r") as f:
         prefixes = json.load(f)
     return prefixes[str(message.guild.id)]
-client = commands.Bot(command_prefix=(get_prefix), case_insensitive=True,  activity=discord.Activity(type=discord.ActivityType.watching, name="Loki on Disney+"), status=discord.Status.idle, intents=discord.Intents.all(), description='Best pokemon bot ever!')
-client.remove_command("help")
+TOKEN = os.environ['TOKEN']
+bot = commands.Bot(command_prefix=(get_prefix), case_insensitive=True,  activity=discord.Activity(type=discord.ActivityType.playing, name="Discord | Loading..."), status=discord.Status.idle, intents=discord.Intents.all(), description='Development Bot for PikaPi Bot.')
+bot.remove_command("help")
 
-@client.event
+@bot.event
+async def on_command_error(ctx: Context, exception):
+    """Event for when a command produces an error."""
+    em = discord.Embed()
+    em.description = str(exception)
+    message = await ctx.send(embed=em)
+    await message.delete(delay=5.0)
+
+@bot.event
 async def on_guild_join(guild):
-    with open('prefixes.json', 'r') as f:
+    """Event for when the Bot joins a guild."""
+    with open('./src/data/prefixes.json', 'r') as f:
         prefixes = json.load(f)
     prefixes[str(guild.id)] = 'c!'
-    with open('prefixes.json', 'w') as f:
+    with open('./src/data/prefixes.json', 'w') as f:
         json.dump(prefixes, f, indent = 4)
 
 
-@client.event
+@bot.event
 async def on_guild_remove(guild):
-    with open('prefixes.json', 'r') as f:
+    """Event for when the Bot gets removed from a guild."""
+    with open('./src/data/prefixes.json', 'r') as f:
         prefixes = json.load(f)
         prefixes.pop(str(guild.id))
 
 
-@client.event
+@bot.event
 async def on_ready():
-    print(f"{client.user} is ready!")
+    """Event for when the Bot is ready."""
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers! | c!cmds"))
+    print(f"{bot.user} is ready!")
 
 
-client.load_extension("cogs.economy")
-client.load_extension("cogs.misc")
-client.load_extension("cogs.pokemon")
-
-client.run("ODYxODI1NTM1MDAwNDQ0OTQ4.YOPbkw.3pWMgyaELb6XA-tEkOzfpySAmqM")
+bot.load_extension("cogs.economy")
+bot.load_extension("cogs.help")
+bot.load_extension("cogs.misc")
+bot.load_extension("cogs.pokemon")
+bot.run(TOKEN)
