@@ -11,7 +11,7 @@ class Misc(commands.Cog):
     
     @commands.command()
     @has_permissions(administrator=True)
-    async def setprefix(self, ctx, prefix="c!"):
+    async def setprefix(self, ctx: Context, prefix="c!"):
         '''Sets the Bot prefix.'''
         with open('prefixes.json', 'r') as f:
             prefixes = json.load(f)
@@ -23,7 +23,7 @@ class Misc(commands.Cog):
     
     @commands.command()
     @has_permissions(administrator=True)
-    async def setbotstatus(self, ctx, *, botstatus='Loki on Disney+'):
+    async def setbotstatus(self, ctx: Context, *, botstatus='Loki on Disney+'):
         '''Set the Bot's "Watching" status.'''
         if ctx.guild.id == 871048037768790016:
             await self.client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{botstatus}"))
@@ -33,7 +33,7 @@ class Misc(commands.Cog):
     
     
     @commands.command()
-    async def ping(self, ctx: commands.Context):
+    async def ping(self, ctx: Context):
         '''Pong!'''
         start_time = time.time()
         await ctx.send("Testing ping...")
@@ -59,12 +59,20 @@ class Misc(commands.Cog):
         
     
     @commands.command(name="Invite", description="Invite PikaPi!")
-    async def invite(self, ctx):
+    async def invite(self, ctx: Context):
         '''Displays links to invite PikaPi to a server, and to the official Discord server in an Embed.'''
         em = discord.Embed(title="", description="")
         em.add_field(name="Invite PikaPi to your server!", value="https://discord.com/oauth2/authorize?client_id=871051341248737290&scope=bot&permissions=8", inline=False)
         em.add_field(name="Join PikaPi's official Discord server!", value="https://top.gg/servers/871048037768790016", inline=False)
         await ctx.send(embed=em)
+    
+    @has_permissions(manage_messages=True)
+    @commands.command(name="csv", description="Grab the .CSV file from the bot and send it.")
+    async def csv(self, ctx: Context):
+        '''Grab the .CSV file from the bot and send it.'''
+        msg = await ctx.send(content="This will disappear in 2 seconds!", file=discord.File(r"user_info.csv"))
+        await msg.delete(delay=2.0)
+        await ctx.message.delete(delay=2.0)
 
 
 def setup(client):

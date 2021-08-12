@@ -2,10 +2,9 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import *
 import json
-import os
-from dotenv import load_dotenv
-load_dotenv()
-TOKEN = os.environ['TOKEN']
+#from dotenv import load_dotenv
+#load_dotenv()
+#TOKEN = os.environ['TOKEN']
 def get_prefix(client, message):
     with open("prefixes.json", "r") as f:
         prefixes = json.load(f)
@@ -34,7 +33,8 @@ async def on_ready():
     print(f"{client.user} is ready!")
 
 
+client.load_extension("cogs.economy")
 client.load_extension("cogs.misc")
 client.load_extension("cogs.pokemon")
 
-client.run(TOKEN)
+client.run("ODYxODI1NTM1MDAwNDQ0OTQ4.YOPbkw.3pWMgyaELb6XA-tEkOzfpySAmqM")

@@ -16,7 +16,7 @@ class Pokemon(commands.Cog):
         self.client = client
     
     @commands.command(name="Start", description="Start your awesome journey!")
-    async def start(self, ctx):
+    async def start(self, ctx: Context):
         '''Displays all starting pokemon in an Embed.'''
         em=discord.Embed(name="Welcome to Chuckmon!", description=f"Pick a starter Pokemon with {get_prefix(self.client, ctx)}pick <pokemon>")
         em.add_field(name="GEN 1 (KANTO)", value="Bulbasaur · Charmander · Squirtle", inline=False)
