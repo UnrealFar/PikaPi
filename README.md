@@ -9,8 +9,6 @@ This repository ("`PikaPi`") is where we develop the [PikaPi](https://top.gg/ser
 
 ## PikaPi Alpha <img alt="Our Bot!" src="https://media.discordapp.net/attachments/872133289375318016/874950183824273418/PikaPi.png?width=50&height=50">
 
-<iframe align="center" src="https://discord.com/widget?id=871048037768790016&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
-
 [PikaPi](https://top.gg/servers/871048037768790016) is a distribution of the `PikaPi` repository with the bot being already available.
 
 [PikaPi](https://github.com/ThePikaPi/PikaPi/) combines the World of Pokemon and your imagination, all inside Discord!
