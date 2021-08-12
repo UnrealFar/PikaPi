@@ -4,7 +4,7 @@ from discord.ext.commands import *
 import json
 import time
 
-class Misc:
+class Misc(commands.Cog):
     def __init__(self, client):
         '''Misc Cog containing commands under the Misc category.'''
         self.client = client
@@ -61,7 +61,7 @@ class Misc:
     @commands.command(name="Invite", description="Invite PikaPi!")
     async def invite(self, ctx):
         '''Displays links to invite PikaPi to a server, and to the official Discord server in an Embed.'''
-        em = discord.Embed(title="Invite", description="Invite links")
+        em = discord.Embed(title="", description="")
         em.add_field(name="Invite PikaPi to your server!", value="https://discord.com/oauth2/authorize?client_id=871051341248737290&scope=bot&permissions=8", inline=False)
         em.add_field(name="Join PikaPi's official Discord server!", value="https://top.gg/servers/871048037768790016", inline=False)
         await ctx.send(embed=em)

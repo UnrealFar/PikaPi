@@ -6,7 +6,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 TOKEN = os.environ['TOKEN']
-def get_prefix(message):
+def get_prefix(client, message):
     with open("prefixes.json", "r") as f:
         prefixes = json.load(f)
     return prefixes[str(message.guild.id)]

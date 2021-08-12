@@ -5,12 +5,12 @@ from discord.ext.commands import *
 import json
 import os
 
-def get_prefix(message):
-        with open("prefixes.json", "r") as f:
-            prefixes = json.load(f)
-        return prefixes[str(message.guild.id)]
+def get_prefix(client, message):
+    with open("prefixes.json", "r") as f:
+        prefixes = json.load(f)
+    return prefixes[str(message.guild.id)]
 
-class Pokemon:
+class Pokemon(commands.Cog):
     def __init__(self, client):
         '''Pokemon Cog containing commands under the Pokemon category.'''
         self.client = client
@@ -18,7 +18,7 @@ class Pokemon:
     @commands.command(name="Start", description="Start your awesome journey!")
     async def start(self, ctx):
         '''Displays all starting pokemon in an Embed.'''
-        em=discord.Embed(name="Welcome to Chuckmon!", description=f"Pick a starter Pokemon with {get_prefix()}pick <pokemon>")
+        em=discord.Embed(name="Welcome to Chuckmon!", description=f"Pick a starter Pokemon with {get_prefix(self.client, ctx)}pick <pokemon>")
         em.add_field(name="GEN 1 (KANTO)", value="Bulbasaur · Charmander · Squirtle", inline=False)
         em.add_field(name="GEN 2 (JHOTO)", value="Chikorita · Cyndaquil · Totodile", inline=False)
         em.add_field(name="GEN 3 (HOENN)", value="Treecko · Torchic · Mudkip", inline=False)
