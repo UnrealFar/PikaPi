@@ -8,11 +8,14 @@ from discord.ext.commands import *
 from dotenv import load_dotenv
 load_dotenv()
 
-def get_prefix(bot, message):
+def get_prefix(self, ctx: Context):
     """Gets the Bot prefix from a file according to the guild the Bot is in."""
+    if not os.path.exists("./src/data/prefixes.json"):   
+            with open("./src/data/prefixes.json", "w") as f:
+                json.dump({"0": "c!", f"{ctx.guild.id}": "c!"}, f, indent = 4)
     with open("./src/data/prefixes.json", "r") as f:
         prefixes = json.load(f)
-    return prefixes[str(message.guild.id)]
+    return prefixes[str(ctx.guild.id)]
 TOKEN = os.environ['TOKEN']
 bot = commands.Bot(command_prefix=(get_prefix), case_insensitive=True,  activity=discord.Activity(type=discord.ActivityType.playing, name="Discord | Loading..."), status=discord.Status.idle, intents=discord.Intents.all(), description='Development Bot for PikaPi Bot.')
 bot.remove_command("help")
