@@ -69,8 +69,8 @@ class Economy(Cog, name="Economy"):
             await ctx.message.delete(delay=5.0)
             return
         elif wallet >= amount:
-            data[user_id]["bank"] += wallet
-            wallet -= amount
+            data[user_id]["bank"] += amount
+            data[user_id]["wallet"] -= amount
         
             with open("./src/data/economy.json", "w") as f:
                 f.seek(0)
