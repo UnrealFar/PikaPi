@@ -63,21 +63,20 @@ class Economy(Cog, name="Economy"):
         if wallet < amount:
             em.description = "Your wallet isn't that big! Try depositing a smaller amount."
             em.colour = discord.Colour.red()
+            
             message = await ctx.send(embed=em)
             await message.delete(delay=5.0)
             await ctx.message.delete(delay=5.0)
             return
+        elif wallet >= amount:
+            bank += wallet
+            wallet -= amount
         
-        bank += wallet
-        wallet -= amount
+            with open("./src/data/economy.json", "w") as f:
+                f.seek(0)
+                json.dump(data, f, indent=4)
         
-        await ctx.send(f"Wallet={wallet} and Bank={bank}")
-        
-        with open("./src/data/economy.json", "w") as f:
-            f.seek(0)
-            json.dump(data, f, indent=4)
-        
-        await ctx.send(embed=em)
+            await ctx.send(embed=em)
     
     
     @command(name="beg", description="Beg for some money!")
