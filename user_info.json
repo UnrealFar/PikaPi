@@ -1,0 +1,14 @@
+{
+    "users": {
+        "0": {
+            "starter": "",
+            "pokemon": []
+        },
+        "268199041542651904": {
+            "starter": "bulbasaur",
+            "pokemon": [
+                "bulbasaur"
+            ]
+        }
+    }
+}

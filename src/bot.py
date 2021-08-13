@@ -1,0 +1,63 @@
+import json
+import os
+
+import discord
+from discord.ext import commands
+from discord.ext.commands import *
+
+# from dotenv import load_dotenv
+# load_dotenv()
+
+def get_prefix(self, ctx: Context):
+    """Gets the Bot prefix from a file according to the guild the Bot is in."""
+    if not os.path.exists("./src/data/prefixes.json"):   
+            with open("./src/data/prefixes.json", "w") as f:
+                json.dump({"0": "c!", f"{ctx.guild.id}": "c!"}, f, indent = 4)
+    with open("./src/data/prefixes.json", "r") as f:
+        prefixes = json.load(f)
+    return prefixes[str(ctx.guild.id)]
+
+PERMISSION = ["268199041542651904", "859996173943177226"]
+# TOKEN = os.environ['TOKEN']
+bot = commands.Bot(command_prefix=(get_prefix), case_insensitive=True,  activity=discord.Activity(type=discord.ActivityType.playing, name="Discord | Loading..."), status=discord.Status.idle, intents=discord.Intents.all(), description='Development Bot for PikaPi Bot.')
+bot.remove_command("help")
+
+
+@bot.event
+async def on_command_error(ctx: Context, exception):
+    """Event for when a command produces an error."""
+    em = discord.Embed()
+    em.description = str(exception)
+    message = await ctx.send(embed=em)
+    await message.delete(delay=5.0)
+
+@bot.event
+async def on_guild_join(guild):
+    """Event for when the Bot joins a guild."""
+    with open('./src/data/prefixes.json', 'r') as f:
+        prefixes = json.load(f)
+    prefixes[str(guild.id)] = 'c!'
+    with open('./src/data/prefixes.json', 'w') as f:
+        json.dump(prefixes, f, indent = 4)
+
+
+@bot.event
+async def on_guild_remove(guild):
+    """Event for when the Bot gets removed from a guild."""
+    with open('./src/data/prefixes.json', 'r') as f:
+        prefixes = json.load(f)
+        prefixes.pop(str(guild.id))
+
+
+@bot.event
+async def on_ready():
+    """Event for when the Bot is ready."""
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers! | c!cmds"))
+    print(f"{bot.user} is ready!")
+
+
+bot.load_extension("cogs.economy")
+bot.load_extension("cogs.help")
+bot.load_extension("cogs.misc")
+bot.load_extension("cogs.pokemon")
+bot.run("ODYxODI1NTM1MDAwNDQ0OTQ4.YOPbkw.yZSZYLP7x0ir2Sgx4Q91zh012ws")
