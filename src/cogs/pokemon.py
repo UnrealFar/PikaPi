@@ -2,7 +2,6 @@ import json
 import os
 
 import discord
-from discord.ext import commands
 from discord.ext.commands import *
 
 
@@ -11,14 +10,20 @@ def get_prefix(bot, message):
         prefixes = json.load(f)
     return prefixes[str(message.guild.id)]
 
-class Pokemon(commands.Cog, name="Pokemon"):
+class Pokemon(Cog, name="Pokemon"):
     def __init__(self, bot):
         """Cog containing commands under the Pokemon category."""
         self.bot = bot
+        if not os.path.exists("./src/data/user_info.json"):   
+            with open("./src/data/user_info.json", "w") as f:
+                json.dump({"users": {"0": {"starter": "", "pokemon": []}}}, f, indent = 4)
+        if not os.path.exists("./src/data/pokemon.json"):   
+            with open("./src/data/pokemon.json", "w") as f:
+                json.dump({"pokemon": [],"starters": []}, f, indent = 4)
     
     # TODO Make the Embed more fancy. Similarly to how the Help command layout.
-    @commands.command(name="start", description="Start your awesome journey!")
-    @commands.cooldown(rate=1, per=0.5)
+    @command(name="start", description="Start your awesome journey!")
+    @cooldown(rate=1, per=0.5)
     async def start(self, ctx: Context):
         """Displays all starting pokemon in an Embed."""
         em=discord.Embed(name="Welcome to Chuckmon!", description=f"Pick a starter Pokemon with {get_prefix(self.bot, ctx)}pick <pokemon>")
@@ -33,16 +38,10 @@ class Pokemon(commands.Cog, name="Pokemon"):
         await ctx.send(embed=em)
     
     
-    @commands.command(name="pick", description="Pick your starter pokemon!")
-    @commands.cooldown(rate=1, per=0.5)
+    @command(name="pick", description="Pick your starter pokemon!")
+    @cooldown(rate=1, per=0.5)
     async def pick(self, ctx: Context, arg: str):
         """Locks in a starter pokemon for that user."""
-        if not os.path.exists("./src/data/user_info.json"):   
-            with open("./src/data/user_info.json", "w") as f:
-                json.dump({"users": {"0": {"starter": "", "pokemon": []}}}, f, indent = 4)
-        if not os.path.exists("./src/data/pokemon.json"):   
-            with open("./src/data/pokemon.json", "w") as f:
-                json.dump({"pokemon": [],"starters": []}, f, indent = 4)
         with open("./src/data/pokemon.json", "r+") as f:
             data = json.load(f)
             if arg.lower() not in data["starters"]:
