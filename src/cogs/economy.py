@@ -69,7 +69,7 @@ class Economy(Cog, name="Economy"):
             await ctx.message.delete(delay=5.0)
             return
         elif wallet >= amount:
-            bank += wallet
+            data[user_id]["bank"] += wallet
             wallet -= amount
         
             with open("./src/data/economy.json", "w") as f:
