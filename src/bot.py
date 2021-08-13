@@ -5,8 +5,8 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import *
 
-# from dotenv import load_dotenv
-# load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
 
 def get_prefix(self, ctx: Context):
     """Gets the Bot prefix from a file according to the guild the Bot is in."""
@@ -16,12 +16,9 @@ def get_prefix(self, ctx: Context):
     with open("./src/data/prefixes.json", "r") as f:
         prefixes = json.load(f)
     return prefixes[str(ctx.guild.id)]
-
-PERMISSION = ["268199041542651904", "859996173943177226"]
-# TOKEN = os.environ['TOKEN']
+TOKEN = os.environ['TOKEN']
 bot = commands.Bot(command_prefix=(get_prefix), case_insensitive=True,  activity=discord.Activity(type=discord.ActivityType.playing, name="Discord | Loading..."), status=discord.Status.idle, intents=discord.Intents.all(), description='Development Bot for PikaPi Bot.')
 bot.remove_command("help")
-
 
 @bot.event
 async def on_command_error(ctx: Context, exception):
@@ -60,4 +57,4 @@ bot.load_extension("cogs.economy")
 bot.load_extension("cogs.help")
 bot.load_extension("cogs.misc")
 bot.load_extension("cogs.pokemon")
-bot.run("ODYxODI1NTM1MDAwNDQ0OTQ4.YOPbkw.yZSZYLP7x0ir2Sgx4Q91zh012ws")
+bot.run(TOKEN)

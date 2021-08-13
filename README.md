@@ -1,17 +1,13 @@
 # PikaPi Alpha Discord Bot
 
-[![Feature Requests](https://img.shields.io/github/issues/microsoft/vscode/feature-request.svg)](https://github.com/ThePikaPi/PikaPi/issues?q=is%3Aopen+is%3Aissue+label%3Afeature-request)
+[![Feature Requests](https://img.shields.io/github/issues/ThePikaPi/PikaPi/feature-request.svg)](https://github.com/ThePikaPi/PikaPi/issues?q=is%3Aopen+is%3Aissue+label%3Afeature-request)
 [![Bugs](https://img.shields.io/github/issues/ThePikaPi/PikaPi/bug.svg)](https://github.com/ThePikaPi/PikaPi/issues?utf8=✓&q=is%3Aissue+is%3Aopen+label%3Abug)
 
 ## The Repository
 
 This repository ("`PikaPi`") is where we develop the [PikaPi](https://top.gg/servers/871048037768790016) Discord bot. We work on the bot here, and also have a [roadmap](https://github.com/ThePikaPi/PikaPi/wiki/Roadmap). This source code is available under the [GNU GPLv3](https://github.com/ThePikaPi/PikaPi/blob/main/LICENSE).
 
-## PikaPi Alpha
-
-<p align="center">
-  <img alt="Our Bot!" src="https://media.discordapp.net/attachments/872133289375318016/874950183824273418/PikaPi.png?width=75&height=75">
-</p>
+## PikaPi Alpha <img alt="Our Bot!" src="https://media.discordapp.net/attachments/872133289375318016/874950183824273418/PikaPi.png?width=50&height=50">
 
 [PikaPi](https://top.gg/servers/871048037768790016) is a distribution of the `PikaPi` repository with the bot being already available.
 
