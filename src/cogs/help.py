@@ -44,7 +44,7 @@ class Help(Cog, name="Help"):
                 em.title = f"Help Menu [prefix: `{self.get_prefix(ctx)}`]"
                 em.description = "This is PikaPi's Help Section! Feel free to read about the commands PikaPi has!"
                 em.add_field(name=f":white_circle:  {cog.qualified_name} [{len(Cog.get_commands(cog))}]", value=temp, inline=False)
-        em.add_field(name=":small_red_triangle_down:", value="[GitHub](https://github.com/ThePikaPi/PikaPi/) | [PikaPi Discord Server](https://top.gg/servers/871048037768790016) | [Invite PikaPi to your server!](https://discord.com/oauth2/authorize?client_id=871051341248737290&scope=bot&permissions=8)", inline=False)
+        em.add_field(name=":small_red_triangle_down:", value="[GitHub](https://github.com/ThePikaPi/PikaPi/) | [PikaPi Discord Server](https://dsc.gg/thepikapi) | [Invite PikaPi to your server!](https://dsc.gg/pikapi)", inline=False)
         await ctx.send(embed=em)
             
 
