@@ -16,9 +16,12 @@ def get_prefix(self, ctx: Context):
     with open("./src/data/prefixes.json", "r") as f:
         prefixes = json.load(f)
     return prefixes[str(ctx.guild.id)]
+
+PERMISSION = ["268199041542651904", "859996173943177226"]
 TOKEN = os.environ['TOKEN']
 bot = commands.Bot(command_prefix=(get_prefix), case_insensitive=True,  activity=discord.Activity(type=discord.ActivityType.playing, name="Discord | Loading..."), status=discord.Status.idle, intents=discord.Intents.all(), description='Development Bot for PikaPi Bot.')
 bot.remove_command("help")
+
 
 @bot.event
 async def on_command_error(ctx: Context, exception):
@@ -51,10 +54,10 @@ async def on_ready():
     """Event for when the Bot is ready."""
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers! | c!cmds"))
     print(f"{bot.user} is ready!")
-
-
+    
 bot.load_extension("cogs.economy")
 bot.load_extension("cogs.help")
 bot.load_extension("cogs.misc")
 bot.load_extension("cogs.pokemon")
+
 bot.run(TOKEN)
