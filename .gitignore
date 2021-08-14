@@ -1,5 +1,4 @@
-*.env
+RE*.env
 *.pyc
 **/src/cogs/__pycache__/
 **/src/data/
-src/mongodb.py

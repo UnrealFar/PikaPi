@@ -14,6 +14,7 @@ class Misc(Cog, name="Misc"):
     @has_permissions(administrator=True)
     async def setprefix(self, ctx: Context, prefix="c!"):
         """Sets the Bot prefix for the server."""
+        # TODO Convert to MongoDB
         with open('./src/data/prefixes.json', 'r') as f:
             prefixes = json.load(f)
         prefixes[str(ctx.guild.id)] = prefix
@@ -22,7 +23,7 @@ class Misc(Cog, name="Misc"):
         em = discord.Embed()
         em.description = f"The prefix for this server has been set to `{prefix}`"
         em.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
-        em.add_field(name=":small_red_triangle_down:", value="[GitHub](https://github.com/ThePikaPi/PikaPi/) | [PikaPi Discord Server](https://dsc.gg/thepikapi) | [Invite PikaPi to your server!](https://dsc.gg/pikapi)", inline=False)
+        em.add_field(name="Links", value="[GitHub](https://github.com/ThePikaPi/PikaPi/) | [PikaPi Discord Server](https://dsc.gg/thepikapi) | [Invite PikaPi to your server!](https://dsc.gg/pikapi)", inline=False)
         await ctx.send(embed=em)
     
     
@@ -42,7 +43,6 @@ class Misc(Cog, name="Misc"):
         em.colour = discord.Color.blurple()
         em.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
         em.add_field(name="Websocket Latency", value=f"{bpsignal} {websocket_latency}ms", inline=False)
-        em.add_field(name=":small_red_triangle_down:", value="[GitHub](https://github.com/ThePikaPi/PikaPi/) | [PikaPi Discord Server](https://dsc.gg/thepikapi) | [Invite PikaPi to your server!](https://dsc.gg/pikapi)", inline=False)
         await ctx.send(embed = em)
 
 
