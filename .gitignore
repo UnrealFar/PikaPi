@@ -1,4 +1,4 @@
-RE*.env
+*.env
 *.pyc
 **/src/cogs/__pycache__/
 **/src/data/
