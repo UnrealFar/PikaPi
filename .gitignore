@@ -1,5 +1,4 @@
 *.env
 *.pyc
-./src/__pycache__/*
-./src/cogs/__pycache__/*
-./src/data/*
+**/src/cogs/__pycache__/
+**/src/data/

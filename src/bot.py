@@ -30,13 +30,14 @@ async def on_command_error(ctx: Context, exception):
     em.description = str(exception)
     message = await ctx.send(embed=em)
     await message.delete(delay=5.0)
+    await ctx.message.delete(delay=5.0)
 
 @bot.event
 async def on_guild_join(guild):
     """Event for when the Bot joins a guild."""
     with open('./src/data/prefixes.json', 'r') as f:
         prefixes = json.load(f)
-    prefixes[str(guild.id)] = 'c!'
+    prefixes[str(guild.id)] = "c!"
     with open('./src/data/prefixes.json', 'w') as f:
         json.dump(prefixes, f, indent = 4)
 
