@@ -26,7 +26,7 @@ class Economy(Cog, name="Economy"):
 
 
     @command(name="balance", description="Check your Balance.", aliases=["bank", "bal"])
-    @cooldown(rate=1, per=0.5)
+    @cooldown(rate=1, per=5)
     async def balance(self, ctx: Context):
         """Check user's balance."""
         await self.check_bank(ctx)
@@ -64,8 +64,7 @@ class Economy(Cog, name="Economy"):
             em.description = "Your wallet isn't that big! Try depositing a smaller amount."
             em.colour = discord.Colour.red()
             
-            message = await ctx.send(embed=em)
-            await message.delete(delay=5.0)
+            await ctx.send(embed=em, delete_after=5.0)
             await ctx.message.delete(delay=5.0)
             return
         elif wallet >= amount:
