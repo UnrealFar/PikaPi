@@ -10,6 +10,7 @@ load_dotenv()
 
 MONGODB = os.environ["MONGODB"]
 client = pymongo.MongoClient(MONGODB)
+db = client.test
 database = client["main"]
 
 users = database["users"]
