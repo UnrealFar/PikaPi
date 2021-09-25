@@ -13,11 +13,12 @@ import os
 from dotenv import load_dotenv
 import random
 import asyncio
+from dotenv import load_dotenv
 from cogs.catch import setup
 
 load_dotenv()
 
-TOKEN = "ODcxMDUxMzQxMjQ4NzM3Mjkw.YQVrxw.ipZo3C0byYIv8Li4qAko8Gl_RtQ"
+TOKEN = os.getenv("TOKEN")
 
 def get_prefix(bot, message):
     if message.guild != None:
