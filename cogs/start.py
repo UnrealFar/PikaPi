@@ -11,7 +11,6 @@ class Start(commands.Cog):
         self.bot = bot
 
     @commands.command(description="Start your awesome journey!")
-    @commands.cooldown(1, 360, commands.BucketType.user)
     async def start(self, ctx):
         prefix = get_prefix(self.bot, ctx.message)
         
@@ -30,15 +29,14 @@ class Start(commands.Cog):
     async def pick(self, ctx, *, pokemon : str):
         prefix = get_prefix(self.bot, ctx.message)
 
-        if os.path.exists("selected-starter.json"):
+        if os.path.exists("caught.json"):
 
-            with open("selected-starter.json", "r") as f:
+            with open("caught.json", "r") as f:
                 data = json.load(f)
 
-                if str(ctx.author.id) in data:
-
-                    await ctx.reply(f"You already have a starter pokemon! Use `{prefix}pokemon` to view it!")
-                    return
+            if str(ctx.author.id) in data:
+                await ctx.reply(f"You already have a starter pokemon! Use `{prefix}pokemon` to view it!")
+                return
 
             with open("starters.json", "r+") as f:
                 data = json.load(f)
@@ -47,14 +45,14 @@ class Start(commands.Cog):
                     await ctx.reply(f"Sorry, but I couldn't find that starter pokemon. Try `{prefix}start` to see the available starter pokemon's!")
                     return
 
-            with open("selected-starter.json", "r") as f:
+            with open("caught.json", "r") as f:
                 choice = json.load(f)
 
-            choice[str(ctx.author.id)] = pokemon
+            starterDict = {1 : f"{pokemon.lower()}"}
+            choice[str(ctx.author.id)] = starterDict
 
-            with open("selected-starter.json", "w") as f:
-                json.dump(choice, f, indent=2)
-
+            with open("caught.json", "w") as f:
+                json.dump(choice, f, indent = 4)
                 await ctx.reply(f"{pokemon.capitalize()} was selected as your starter pokemon!")
 
 def setup(bot):

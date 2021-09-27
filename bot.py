@@ -78,21 +78,6 @@ async def battle(ctx, member : discord.Member):
     else:
         await ctx.reply("You cannot battle a bot!")
 
-@bot.event
-async def on_message(msg):
-    spawnper = random.randrange(1, 50)
-    prefix = get_prefix(bot, msg)
-    pokerange = random.randrange(1, 898)    
-
-    pokemon = f"https://raw.githubusercontent.com/poketwo/data/master/images/{pokerange}.png"
-
-    if spawnper == 25:
-        em = discord.Embed(title="A new pokemon appeared!", description=f"Type `{prefix}catch <pokemon>` to catch it!")
-        em.set_image(url=pokemon)
-        await msg.channel.send(embed=em)
-
-    await bot.process_commands(msg)
-
 initial_extensions = ["cogs.catch", "cogs.start", "cogs.pokedex"]
 
 for extension in initial_extensions:
