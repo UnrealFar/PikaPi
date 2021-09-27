@@ -1,7 +1,6 @@
 # Imports
 
 import io
-import csv
 import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import has_permissions
@@ -13,8 +12,6 @@ import os
 from dotenv import load_dotenv
 import random
 import asyncio
-from dotenv import load_dotenv
-from cogs.catch import setup
 
 load_dotenv()
 
@@ -29,7 +26,7 @@ def get_prefix(bot, message):
         return ("p!") 
 
 bot = commands.Bot(command_prefix=(get_prefix), case_insensitive=True,  activity=discord.Activity(type=discord.ActivityType.watching, name="Loki on Disney+"), status=discord.Status.idle, intents=discord.Intents.all(), description='Best pokemon bot ever!')
-bot.remove_command("help")
+#bot.remove_command("help")
 
 bot.owner_ids = [859996173943177226, 551257232143024139]
 
@@ -47,7 +44,7 @@ async def on_ready():
 async def on_guild_join(guild):
     with open('prefixes.json', 'r') as f:
         prefixes = json.load(f)
-    prefixes[str(guild.id)] = 'c!'
+    prefixes[str(guild.id)] = 'p!'
     with open('prefixes.json', 'w') as f:
         json.dump(prefixes, f, indent = 4)
 
@@ -83,27 +80,61 @@ async def battle(ctx, member : discord.Member):
 
 @bot.event
 async def on_message(msg):
-    spawnper = random.randrange(1, 30)
+    spawnper = random.randrange(1, 50)
     prefix = get_prefix(bot, msg)
     pokerange = random.randrange(1, 898)    
 
     pokemon = f"https://raw.githubusercontent.com/poketwo/data/master/images/{pokerange}.png"
 
-    if spawnper == 15:
+    if spawnper == 25:
         em = discord.Embed(title="A new pokemon appeared!", description=f"Type `{prefix}catch <pokemon>` to catch it!")
         em.set_image(url=pokemon)
         await msg.channel.send(embed=em)
 
     await bot.process_commands(msg)
 
-initial_extensions = ["cogs.catch", "cogs.start"]
+initial_extensions = ["cogs.catch", "cogs.start", "cogs.pokedex"]
 
 for extension in initial_extensions:
     bot.load_extension(extension)
 
+#help
+
+@bot.slash_command()
+async def help(ctx, command: str = None, category: str = None):
+    helpEm = discord.Embed(title = "Chuck's Help Menu", description = f"Do /help <command> to get more info abt that command and /help <category> to get more info about a category!", colour = 0x9CCFFF)
+    helpEm.set_thumbnail(url = bot.user.display_avatar.url)
+    helpEm.set_footer(icon_url = ctx.author.display_avatar.url, text = f"Requested by {ctx.author}")
+
+    if command is None:
+        if category is None:
+            cogs_desc = ""
+            for cog in bot.cogs:
+                cogs_desc += f"`{cog}` {bot.cogs[cog].__doc__}\n"
+            helpEm.add_field(name = "Cogs", value = cogs_desc, inline=False)
+            await ctx.send(embed = helpEm)
+            return
+
+    if category:
+        if command:
+            await ctx.send("Sorry! You can only select either command or category!")
+        if not command:
+            try:
+                cogname = category.lower()
+                cogname = cogname.capitalize()
+                cog = bot.get_cog(name = f"{cogname}")
+                commands = cog.get_commands()
+            except:
+                await ctx.send(f"Cog called {cogname} was not found! Please do /help to view the list of available cogs!")
+                return
+            for cmd in commands:
+                helpEm.add_field(name = f"{cmd.name}", value = f"**Usage:** `c!{cmd.name} {cmd.signature}`")
+            await ctx.send(embed = helpEm)
+            return
+
 # latency
 
-@bot.slash_command(name = "ping", guild_ids = [890877039463260170])
+@bot.slash_command(name = "ping")
 async def slashping(ctx):
     """🏓 Shows PikaPi's ping"""
     bot_ping = round(bot.latency * 1000)

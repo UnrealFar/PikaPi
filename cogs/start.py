@@ -1,8 +1,6 @@
 from discord.ext import commands
 import discord
-
 from bot import get_prefix
-
 import os
 import json
 
