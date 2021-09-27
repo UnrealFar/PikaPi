@@ -87,7 +87,7 @@ for extension in initial_extensions:
 
 @bot.slash_command()
 async def help(ctx, command: str = None, category: str = None):
-    helpEm = discord.Embed(title = "Chuck's Help Menu", description = f"Do /help <command> to get more info abt that command and /help <category> to get more info about a category!", colour = 0x9CCFFF)
+    helpEm = discord.Embed(title = "PikaPi's Help Menu", description = f"Do /help <command> to get more info abt that command and /help <category> to get more info about a category!", colour = 0x9CCFFF)
     helpEm.set_thumbnail(url = bot.user.display_avatar.url)
     helpEm.set_footer(icon_url = ctx.author.display_avatar.url, text = f"Requested by {ctx.author}")
 
@@ -116,6 +116,16 @@ async def help(ctx, command: str = None, category: str = None):
                 helpEm.add_field(name = f"{cmd.name}", value = f"**Usage:** `c!{cmd.name} {cmd.signature}`")
             await ctx.send(embed = helpEm)
             return
+
+    if command:
+        if category is None:
+            try:
+                cmd = bot.get_command(name = f"{command}")
+            except:
+                await ctx.send(f"Sorry! That command wasn't found! Please do /help <cogname> to view the list of available commands each cog has!")
+                return
+            helpEm.add_field(name = f"Command: {cmd.name}", value = f"**Usage:** `c!{cmd.name} {cmd.signature}`")
+            await ctx.send(embed = helpEm)
 
 # latency
 
