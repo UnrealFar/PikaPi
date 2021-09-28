@@ -1,0 +1,124 @@
+from discord.ext import commands
+import discord
+import requests
+import json
+from bot import get_prefix
+
+class Pokedex(commands.Cog):
+    """Pokedex Stuff"""
+
+    def __init__(self, bot):
+        self.bot = bot
+
+    @commands.command(name = "pokedex", aliases = ["d", "dex"])
+    async def pokedex(self, ctx, *, pokemon):
+        resp = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon}")
+        try:
+            pname = resp.json()["name"].capitalize()
+        except:
+            await ctx.send(f"Pokemon called **`{pokemon}`** doesn't exist!")
+            return
+        pID = resp.json()["id"]
+        pImg = f"https://raw.githubusercontent.com/poketwo/data/master/images/{pID}.png"
+        ptypes = resp.json()["types"]
+        ptype1 = ptypes[0]["type"]["name"].capitalize()
+        try:
+            ptype2 = ptypes[1]["type"]["name"].capitalize()
+        except:
+            ptype2 = ""
+        try:
+            ptype3 = ptypes[2]["type"]["name"].capitalize()
+        except:
+            ptype3 = ""
+        try:
+            ptype4 = ptypes[3]["type"]["name"].capitalize()
+        except:
+            ptype4 = ""
+        pheight = resp.json()["height"]
+        pheight = float(pheight / 10)
+        pweight = resp.json()["weight"]
+        pweight = float(pweight / 10)
+        dexEm = discord.Embed(title = f"#{pID} {pname}", colour = discord.Colour.dark_blue())
+        dexEm.add_field(name = "Types", value = f"{ptype1}\n{ptype2}\n{ptype3}\n{ptype4}", inline = False)
+        dexEm.add_field(name = "Appearance", value = f"**Height**: {pheight}m\n**Weight**: {pweight}kg", inline = False)
+        dexEm.set_image(url = pImg)
+        await ctx.send(embed = dexEm)
+
+    @commands.command(name = "pokemon",aliases = ["p"])
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def pokemon(self, ctx, member : discord.Member = None):
+        if not member:
+            member = ctx.author
+        prefix = get_prefix(self.bot, ctx.message)
+        author_id = str(member.id)
+
+        with open("caught.json", "r") as f:
+            caught = json.load(f)
+
+        if author_id not in caught:
+            await ctx.reply(f"You haven't started yet! Use `{prefix}start` to start!")
+            return
+
+        pList = ""
+        counter = 0
+        user_pokes = caught[str(author_id)]
+        pokEm = discord.Embed(colour = discord.Colour.red())
+        pokEm.set_thumbnail(url = ctx.author.display_avatar.url)
+
+        for poke in user_pokes:
+            counter += 1
+            poke_id = counter
+            poke_s = user_pokes[str(counter)]
+            poke_name = poke_s["name"].capitalize()
+            poke_nick = poke_s["nick"]
+            poke_lvl = poke_s["lvl"]
+            quote1 = ""
+            quote2 = ""
+            if poke_nick != "":
+                quote1 = "*'"
+                quote2 = "'*"
+            pList += f"`{poke_id}`  **{poke_name.capitalize()}** {quote1}{poke_nick}{quote2} • Lvl.{poke_lvl}\n"
+            if counter == 11:
+                break
+
+        pokEm.add_field(name = f"{member.name}'s Pokemon", value = f"{pList}")
+        await ctx.send(embed = pokEm)
+
+    @commands.command(name = "nickname", aliases = ["nick"])
+    @commands.cooldown(1, 1, commands.BucketType.default)
+    async def nick(self, ctx, pokemon_id: str, *, newnick: str = None):
+        prefix = get_prefix(self.bot, ctx.message)
+
+        with open("caught.json", "r") as f:
+            data = json.load(f)
+
+        if str(ctx.author.id) not in data:
+            await ctx.send(f"You haven't started yet! Please use {prefix}start to start your journey with us!")
+            return
+
+        try:
+            user_poke = data[str(ctx.author.id)][str(pokemon_id)]
+            poke_name = user_poke["name"]
+            poke_lvl = user_poke["lvl"]
+            poke_nick = user_poke["nick"]
+        except:
+            await ctx.send(f"Pokemon with ID {pokemon_id} wasn't found!")
+            return
+
+        if newnick is None:
+            new_nick = ""
+            resp = f"Your level {poke_lvl} **{poke_name}**'s nickname was reset!"
+
+        else:
+            new_nick = newnick
+            resp = f"Your level {poke_lvl} **{poke_name}**'s nickname was changed to {newnick}"
+        
+        data[str(ctx.author.id)][str(pokemon_id)]["nick"] = new_nick
+        
+        with open("caught.json", "w") as f:
+            json.dump(data, f, indent = 4)
+
+        await ctx.send(resp)
+
+def setup(bot):
+    bot.add_cog(Pokedex(bot))

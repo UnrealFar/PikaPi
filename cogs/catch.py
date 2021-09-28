@@ -23,16 +23,29 @@ class Catch(commands.Cog):
             return
 
         spawnper = random.randrange(1, 30)
+        
         prefix = get_prefix(self.bot, msg)
 
         if spawnper == 15:
             pRange = random.randrange(1, 898)
+            rarC = requests.get(f"https://pokeapi.co/api/v2/pokemon-species/{pRange}")
+            pLegC = rarC.json()["is_legendary"]
+            pMytC = rarC.json()["is_mythical"]
+            lc = [1, 5]
+            mc = [1, 3]
+            if pLegC == "true":
+                lc = random.choice(lc)
+                if lc != 3:
+                    return
+            if pMytC == "true":
+                mc = random.choice(mc)
+                if mc != 2:
+                    return
             req = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pRange}")
             pName = req.json()["name"].capitalize()
             pImg = f"https://raw.githubusercontent.com/poketwo/data/master/images/{pRange}.png"
             fledStr = "A wild pokemon just appeared!"
             try:
-                fledStr = f"The wild {uncaught[msg.channel.id]} has fled! A new wild pokemon just appeared!"
                 uncaught.pop(f"{msg.channel.id}")
             except:
                 pass
@@ -65,15 +78,25 @@ class Catch(commands.Cog):
                 await ctx.reply(f"You haven't started yet! Use `{prefix}start` to start!")
                 return
 
+            statReq = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon.lower()}")
+            nick = ""
+            lvl = random.randrange(0, 101)
+            stats = statReq.json()["stats"]
+            hp_stat = int(stats[0]["base_stat"])
+            atk_stat = int(stats[1]["base_stat"])
+            df_stat = int(stats[2]["base_stat"])
+            spd_stat = int(stats[5]["base_stat"])
+
             d = c[str(ctx.author.id)]
             counter = len(d) + 1
-            pokeDict = {counter : f"{tbc.lower()}"}
+            statD = {"name": tbc.lower(), "nick": nick, "lvl": lvl, "hp": hp_stat, "atk": atk_stat, "df": df_stat, "spd": spd_stat}
+            pokeDict = {counter : statD}
             c[str(ctx.author.id)].update(pokeDict)
 
             with open("caught.json", "w") as f:
                 json.dump(c, f, indent=4)
 
-            await ctx.send(f"Congratulations {ctx.author.mention}! You caught a {tbc.capitalize()}")
+            await ctx.send(f"Congratulations {ctx.author.mention}! You caught a level **{lvl}** {tbc.capitalize()}")
             uncaught.pop(f"{ctx.channel.id}")
 
 def setup(bot):

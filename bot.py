@@ -78,7 +78,7 @@ async def battle(ctx, member : discord.Member):
     else:
         await ctx.reply("You cannot battle a bot!")
 
-initial_extensions = ["cogs.catch", "cogs.start", "cogs.pokedex"]
+initial_extensions = ["cogs.catch", "cogs.start", "cogs.pokemon", "cogs.errors"]
 
 for extension in initial_extensions:
     bot.load_extension(extension)

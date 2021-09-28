@@ -3,6 +3,8 @@ import discord
 from bot import get_prefix
 import os
 import json
+import random
+import requests
 
 class Start(commands.Cog):
     """Start your amazing journey!"""
@@ -26,6 +28,7 @@ class Start(commands.Cog):
         await ctx.send(embed=em)
 
     @commands.command()
+    @commands.cooldown(1, 1, commands.BucketType.default)
     async def pick(self, ctx, *, pokemon : str):
         prefix = get_prefix(self.bot, ctx.message)
 
@@ -45,10 +48,20 @@ class Start(commands.Cog):
                     await ctx.reply(f"Sorry, but I couldn't find that starter pokemon. Try `{prefix}start` to see the available starter pokemon's!")
                     return
 
+            statReq = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon.lower()}")
+            nick = ""
+            lvl = 5
+            stats = statReq.json()["stats"]
+            hp_stat = int(stats[0]["base_stat"])
+            atk_stat = int(stats[1]["base_stat"])
+            df_stat = int(stats[2]["base_stat"])
+            spd_stat = int(stats[5]["base_stat"])
+
             with open("caught.json", "r") as f:
                 choice = json.load(f)
 
-            starterDict = {1 : f"{pokemon.lower()}"}
+            statD = {"name": pokemon.lower(), "lvl": lvl, "hp": hp_stat, "nick": nick, "atk": atk_stat, "df": df_stat, "spd": spd_stat}
+            starterDict = {1 : statD}
             choice[str(ctx.author.id)] = starterDict
 
             with open("caught.json", "w") as f:
