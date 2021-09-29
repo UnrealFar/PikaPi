@@ -1,5 +1,4 @@
-# Imports
-
+import aiosqlite
 import io
 import discord
 from discord.ext import commands, tasks
@@ -27,7 +26,7 @@ def get_prefix(bot, message):
 
 bot = commands.Bot(command_prefix=(get_prefix), case_insensitive=True,  activity=discord.Activity(type=discord.ActivityType.watching, name="Loki on Disney+"), status=discord.Status.idle, intents=discord.Intents.all(), description='Best pokemon bot ever!')
 #bot.remove_command("help")
-
+bot.remove_command(name = "help")
 bot.owner_ids = [859996173943177226, 551257232143024139]
 
 # On Ready
@@ -78,10 +77,10 @@ async def battle(ctx, member : discord.Member):
     else:
         await ctx.reply("You cannot battle a bot!")
 
-initial_extensions = ["cogs.catch", "cogs.start", "cogs.pokemon", "cogs.errors"]
-
-for extension in initial_extensions:
-    bot.load_extension(extension)
+#Load cogs
+for filename in os.listdir("./cogs"):
+    if filename.endswith(".py"):
+        bot.load_extension(f"cogs.{filename[:-3]}")
 
 #help
 
@@ -136,5 +135,24 @@ async def slashping(ctx):
     pingEm = discord.Embed(title="Pong!", description="", colour = discord.Color.blurple())
     pingEm.add_field(name="Bot Ping", value=f"🏓 {bot_ping}ms", inline=False)
     await ctx.send(embed = pingEm)
+
+class Confirm(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.value = None
+
+    @discord.ui.button(label="Confirm", style=discord.ButtonStyle.green)
+    async def confirm(
+        self, button: discord.ui.Button, interaction: discord.Interaction
+    ):
+        await interaction.response.send_message("Confirmed!", ephemeral=True)
+        self.value = True
+        self.stop()
+
+    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.grey)
+    async def cancel(self, button: discord.ui.Button, interaction: discord.Interaction):
+        await interaction.response.send_message("Cancelled!", ephemeral=True)
+        self.value = False
+        self.stop()
 
 bot.run(TOKEN)

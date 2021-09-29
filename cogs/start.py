@@ -28,12 +28,10 @@ class Start(commands.Cog):
         await ctx.send(embed=em)
 
     @commands.command()
-    @commands.cooldown(1, 1, commands.BucketType.default)
     async def pick(self, ctx, *, pokemon : str):
         prefix = get_prefix(self.bot, ctx.message)
 
         if os.path.exists("caught.json"):
-
             with open("caught.json", "r") as f:
                 data = json.load(f)
 
@@ -49,24 +47,34 @@ class Start(commands.Cog):
                     return
 
             statReq = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon.lower()}")
-            nick = ""
+            nick = "Starter"
             lvl = 5
+            count = 1
             stats = statReq.json()["stats"]
-            hp_stat = int(stats[0]["base_stat"])
-            atk_stat = int(stats[1]["base_stat"])
-            df_stat = int(stats[2]["base_stat"])
-            spd_stat = int(stats[5]["base_stat"])
+            hp_stat = int(stats[0]["base_stat"]) * lvl
+            atk_stat = int(stats[1]["base_stat"]) * lvl
+            df_stat = int(stats[2]["base_stat"]) * lvl
+            spd_stat = int(stats[5]["base_stat"]) * lvl
+
+            with open("counter.json", "r") as g:
+                pcounter = json.load(g)
+
+            count = count + int(pcounter["pokecounter"])
+            pcounter["pokecounter"] = count
 
             with open("caught.json", "r") as f:
                 choice = json.load(f)
 
-            statD = {"name": pokemon.lower(), "lvl": lvl, "hp": hp_stat, "nick": nick, "atk": atk_stat, "df": df_stat, "spd": spd_stat}
+            statD = {"name": pokemon.lower(), "perm_id": count, "lvl": lvl, "hp": hp_stat, "nick": nick, "atk": atk_stat, "df": df_stat, "spd": spd_stat}
             starterDict = {1 : statD}
             choice[str(ctx.author.id)] = starterDict
 
             with open("caught.json", "w") as f:
-                json.dump(choice, f, indent = 4)
+                json.dump(choice, f)
                 await ctx.reply(f"{pokemon.capitalize()} was selected as your starter pokemon!")
+
+            with open("counter.json", "w") as g:
+                json.dump(pcounter, g, indent = 4)
 
 def setup(bot):
     bot.add_cog(Start(bot))

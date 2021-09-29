@@ -12,6 +12,7 @@ class Pokedex(commands.Cog):
 
     @commands.command(name = "pokedex", aliases = ["d", "dex"])
     async def pokedex(self, ctx, *, pokemon):
+        pokemon = pokemon.replace(" ", "-")
         resp = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon}")
         try:
             pname = resp.json()["name"].capitalize()
@@ -34,11 +35,18 @@ class Pokedex(commands.Cog):
             ptype4 = ptypes[3]["type"]["name"].capitalize()
         except:
             ptype4 = ""
+        rarC = requests.get(f"https://pokeapi.co/api/v2/pokemon-species/{pID}")
+        pLeg = rarC.json()["is_legendary"]
+        pMyth = rarC.json()["is_mythical"]
         pheight = resp.json()["height"]
         pheight = float(pheight / 10)
         pweight = resp.json()["weight"]
         pweight = float(pweight / 10)
         dexEm = discord.Embed(title = f"#{pID} {pname}", colour = discord.Colour.dark_blue())
+        if pLeg:
+            dexEm.add_field(name = "Rarity", value = "Legendary")
+        if pMyth:
+            dexEm.add_field(name = "Rarity", value = "Mythical")
         dexEm.add_field(name = "Types", value = f"{ptype1}\n{ptype2}\n{ptype3}\n{ptype4}", inline = False)
         dexEm.add_field(name = "Appearance", value = f"**Height**: {pheight}m\n**Weight**: {pweight}kg", inline = False)
         dexEm.set_image(url = pImg)
@@ -63,7 +71,7 @@ class Pokedex(commands.Cog):
         counter = 0
         user_pokes = caught[str(author_id)]
         pokEm = discord.Embed(colour = discord.Colour.red())
-        pokEm.set_thumbnail(url = ctx.author.display_avatar.url)
+        pokEm.set_thumbnail(url = member.display_avatar.url)
 
         for poke in user_pokes:
             counter += 1
@@ -72,14 +80,7 @@ class Pokedex(commands.Cog):
             poke_name = poke_s["name"].capitalize()
             poke_nick = poke_s["nick"]
             poke_lvl = poke_s["lvl"]
-            quote1 = ""
-            quote2 = ""
-            if poke_nick != "":
-                quote1 = "*'"
-                quote2 = "'*"
-            pList += f"`{poke_id}`  **{poke_name.capitalize()}** {quote1}{poke_nick}{quote2} • Lvl.{poke_lvl}\n"
-            if counter == 11:
-                break
+            pList += f"`{poke_id}` - **{poke_name.capitalize()}** - {poke_nick} Lvl. {poke_lvl}\n"
 
         pokEm.add_field(name = f"{member.name}'s Pokemon", value = f"{pList}")
         await ctx.send(embed = pokEm)

@@ -22,7 +22,7 @@ class Catch(commands.Cog):
         if msg.guild is None:
             return
 
-        spawnper = random.randrange(1, 30)
+        spawnper = random.randrange(1, 51)
         
         prefix = get_prefix(self.bot, msg)
 
@@ -56,9 +56,11 @@ class Catch(commands.Cog):
             await msg.channel.send(embed = em)
 
     @commands.command(aliases = ["c"])
+    @commands.cooldown(1, 1, commands.BucketType.channel)
     async def catch(self, ctx, *, pokemon: str):
         prefix = get_prefix(self.bot, ctx.message)
         pokemon = pokemon.lower()
+        pokemon = pokemon.replace(' ', '-')
 
         try:
             tbc = uncaught[f"{ctx.channel.id}"]
@@ -80,21 +82,31 @@ class Catch(commands.Cog):
 
             statReq = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon.lower()}")
             nick = ""
-            lvl = random.randrange(0, 101)
+            count = 1
+            lvl = random.randrange(5, 21)
             stats = statReq.json()["stats"]
             hp_stat = int(stats[0]["base_stat"])
             atk_stat = int(stats[1]["base_stat"])
             df_stat = int(stats[2]["base_stat"])
             spd_stat = int(stats[5]["base_stat"])
 
+            with open("counter.json", "r") as g:
+                pcounter = json.load(g)
+
+            count = count + int(pcounter["pokecounter"])
+            pcounter["pokecounter"] = count
+
             d = c[str(ctx.author.id)]
             counter = len(d) + 1
-            statD = {"name": tbc.lower(), "nick": nick, "lvl": lvl, "hp": hp_stat, "atk": atk_stat, "df": df_stat, "spd": spd_stat}
+            statD = {"name": tbc.lower(), "perm_id": count, "nick": nick, "lvl": lvl, "hp": hp_stat, "atk": atk_stat, "df": df_stat, "spd": spd_stat}
             pokeDict = {counter : statD}
             c[str(ctx.author.id)].update(pokeDict)
 
             with open("caught.json", "w") as f:
-                json.dump(c, f, indent=4)
+                json.dump(c, f)
+
+            with open("counter.json", "w") as g:
+                json.dump(pcounter, g, indent = 4)
 
             await ctx.send(f"Congratulations {ctx.author.mention}! You caught a level **{lvl}** {tbc.capitalize()}")
             uncaught.pop(f"{ctx.channel.id}")
