@@ -2,8 +2,6 @@ from discord.ext import commands
 import discord
 import requests
 import random
-from bot import get_prefix
-
 import json
 
 uncaught = {}
@@ -24,7 +22,7 @@ class Catch(commands.Cog):
 
         spawnper = random.randrange(1, 51)
         
-        prefix = get_prefix(self.bot, msg)
+        prefix = "p!"
 
         if spawnper == 15:
             pRange = random.randrange(1, 898)
@@ -58,7 +56,7 @@ class Catch(commands.Cog):
     @commands.command(aliases = ["c"])
     @commands.cooldown(1, 1, commands.BucketType.channel)
     async def catch(self, ctx, *, pokemon: str):
-        prefix = get_prefix(self.bot, ctx.message)
+        prefix = "p!"
         pokemon = pokemon.lower()
         pokemon = pokemon.replace(' ', '-')
 
