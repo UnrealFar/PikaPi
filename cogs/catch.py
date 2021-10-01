@@ -20,7 +20,7 @@ class Catch(commands.Cog):
         if msg.guild is None:
             return
 
-        spawnper = random.randrange(1, 5)
+        spawnper = random.randrange(1, 30)
         
         prefix = "p!"
 

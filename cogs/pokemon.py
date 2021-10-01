@@ -97,7 +97,6 @@ class Pokedex(commands.Cog):
             user_poke = data[str(ctx.author.id)][str(pokemon_id)]
             poke_name = user_poke["name"]
             poke_lvl = user_poke["lvl"]
-            poke_nick = user_poke["nick"]
         except:
             await ctx.send(f"Pokemon with ID {pokemon_id} wasn't found!")
             return
