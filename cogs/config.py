@@ -1,6 +1,5 @@
 from discord.ext import commands
 import discord
-import motor
 
 class Config(commands.Cog):
 

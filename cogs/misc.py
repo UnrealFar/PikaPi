@@ -10,6 +10,12 @@ class Misc(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_completion(self, ctx):
+        if ctx.command.qualified_name == "usage":
+            return
+
+        if ctx.command.name == "jishaku":
+            return
+
         if await self.bot.command_usage.find(ctx.command.qualified_name) is None:
             await self.bot.command_usage.upsert({"_id": ctx.command.qualified_name, "usage_count": 1})
 
@@ -35,6 +41,7 @@ class Misc(commands.Cog):
 
             for item in next_commands:
                 use_percent = item[1] / total_commands_run
+                use_percent = int(use_percent)
                 message += f"***{item[0]}***: Total uses: ***`{item[1]}`*** **`{use_percent}`**\n"
 
             pages.append(message)

@@ -1,6 +1,5 @@
 from discord.ext import commands
 import discord
-from bot import get_prefix
 import os
 import json
 import random
@@ -14,9 +13,7 @@ class Start(commands.Cog):
 
     @commands.command(description="Start your awesome journey!")
     async def start(self, ctx):
-        prefix = get_prefix(self.bot, ctx.message)
-        
-        em = discord.Embed(title="Welcome to Pikapi!", description=f"Pick a starter Pokemon with `{prefix}pick <pokemon>`")
+        em = discord.Embed(title="Welcome to Pikapi!", description=f"Pick a starter Pokemon with `p!pick <pokemon>`")
         em.add_field(name="GEN 1 (KANTO)", value="Bulbasaur · Charmander · Squirtle", inline=False)
         em.add_field(name="GEN 2 (JHOTO)", value="Chikorita · Cyndaquil · Totodile", inline=False)
         em.add_field(name="GEN 3 (HOENN)", value="Treecko · Torchic · Mudkip", inline=False)
@@ -29,52 +26,54 @@ class Start(commands.Cog):
 
     @commands.command()
     async def pick(self, ctx, *, pokemon : str):
-        prefix = get_prefix(self.bot, ctx.message)
+        if ctx.guild is None:
+            return await ctx.send("You can pick your starter pokemon only in a guild!")
 
-        if os.path.exists("caught.json"):
-            with open("caught.json", "r") as f:
-                data = json.load(f)
+        acc_check = await self.bot.pokedata.get_all()
+        checks = []
+        counter = 0
 
-            if str(ctx.author.id) in data:
-                await ctx.reply(f"You already have a starter pokemon! Use `{prefix}pokemon` to view it!")
-                return
+        if not acc_check:
+            pass
 
-            with open("starters.json", "r+") as f:
-                data = json.load(f)
+        for i in acc_check:
+            checkdata = acc_check[counter]["_id"]
+            counter += 1
+            checks.append(checkdata)
+
+        if ctx.author.id in checks:
+            return await ctx.send("You have already started your journey! Please do `p!pokemon` to view your pokemon!")
+
+        with open("starters.json", "r+") as f:
+            sdata = json.load(f)
                 
-                if pokemon.lower() not in data:
-                    await ctx.reply(f"Sorry, but I couldn't find that starter pokemon. Try `{prefix}start` to see the available starter pokemon's!")
-                    return
+        if pokemon.lower() not in sdata:
+            return await ctx.reply(f"Sorry, but I couldn't find that starter pokemon. Try `p!start` to see the available starter pokemon's!")
 
-            statReq = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon.lower()}")
-            nick = "Starter"
-            lvl = 5
-            count = 1
-            stats = statReq.json()["stats"]
-            hp_stat = int(stats[0]["base_stat"]) * lvl
-            atk_stat = int(stats[1]["base_stat"]) * lvl
-            df_stat = int(stats[2]["base_stat"]) * lvl
-            spd_stat = int(stats[5]["base_stat"]) * lvl
+        statReq = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon.lower()}")
+        nick = "Starter"
+        count = 1
+        lvl = 5
+        stats = statReq.json()["stats"]
+        hp_stat = int(stats[0]["base_stat"])
+        atk_stat = int(stats[1]["base_stat"])
+        df_stat = int(stats[2]["base_stat"])
+        spd_stat = int(stats[5]["base_stat"])
+        pokemon = pokemon.lower()
 
-            with open("counter.json", "r") as g:
-                pcounter = json.load(g)
+        with open("counter.json", "r") as g:
+            pcounter = json.load(g)
 
-            count = count + int(pcounter["pokecounter"])
-            pcounter["pokecounter"] = count
+        count = count + int(pcounter["pokecounter"])
+        pcounter["pokecounter"] = count
 
-            with open("caught.json", "r") as f:
-                choice = json.load(f)
+        with open("counter.json", "w") as g:
+            json.dump(pcounter, g, indent = 4)
 
-            statD = {"name": pokemon.lower(), "perm_id": count, "lvl": lvl, "hp": hp_stat, "nick": nick, "atk": atk_stat, "df": df_stat, "spd": spd_stat}
-            starterDict = {1 : statD}
-            choice[str(ctx.author.id)] = starterDict
-
-            with open("caught.json", "w") as f:
-                json.dump(choice, f)
-                await ctx.reply(f"{pokemon.capitalize()} was selected as your starter pokemon!")
-
-            with open("counter.json", "w") as g:
-                json.dump(pcounter, g, indent = 4)
+        statD = {"name": pokemon, "pNum": count, "lvl": lvl, "hp": hp_stat, "nick": nick, "atk": atk_stat, "df": df_stat, "spd": spd_stat} 
+        starterDict = {"_id": ctx.author.id, "p1": {"stats": statD}}
+        await self.bot.pokedata.insert(starterDict)
+        await ctx.send(f"You have chosen {pokemon} as your starter pokemon!")
 
 def setup(bot):
     bot.add_cog(Start(bot))

@@ -2,7 +2,6 @@ from discord.ext import commands
 import discord
 import requests
 import json
-from bot import get_prefix
 
 class Pokedex(commands.Cog):
     """Pokedex Stuff"""
@@ -57,14 +56,13 @@ class Pokedex(commands.Cog):
     async def pokemon(self, ctx, member : discord.Member = None):
         if not member:
             member = ctx.author
-        prefix = get_prefix(self.bot, ctx.message)
         author_id = str(member.id)
 
         with open("caught.json", "r") as f:
             caught = json.load(f)
 
         if author_id not in caught:
-            await ctx.reply(f"You haven't started yet! Use `{prefix}start` to start!")
+            await ctx.reply(f"You haven't started yet! Use `p!start` to start!")
             return
 
         pList = ""
@@ -88,13 +86,11 @@ class Pokedex(commands.Cog):
     @commands.command(name = "nickname", aliases = ["nick"])
     @commands.cooldown(1, 1, commands.BucketType.default)
     async def nick(self, ctx, pokemon_id: str, *, newnick: str = None):
-        prefix = get_prefix(self.bot, ctx.message)
-
         with open("caught.json", "r") as f:
             data = json.load(f)
 
         if str(ctx.author.id) not in data:
-            await ctx.send(f"You haven't started yet! Please use {prefix}start to start your journey with us!")
+            await ctx.send(f"You haven't started yet! Please use p!start to start your journey with us!")
             return
 
         try:

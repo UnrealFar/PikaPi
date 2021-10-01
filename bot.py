@@ -28,15 +28,19 @@ async def get_prefix(bot, message):
     except:
         return commands.when_mentioned_or(DEFAULT_PREFIX)(bot, message)
 
-bot = commands.Bot(command_prefix = get_prefix,case_insensitive=True, activity=discord.Activity(type=discord.ActivityType.watching, name="Pokemon"), status=discord.Status.dnd, intents=discord.Intents.all(), description='Best pokemon bot ever!')
-#bot.remove_command("help")
-bot.owner_ids = [859996173943177226, 551257232143024139]
+bot = commands.AutoShardedBot(command_prefix = get_prefix,case_insensitive=True, activity=discord.Activity(type=discord.ActivityType.watching, name="Pokemon"), status=discord.Status.dnd, intents=discord.Intents.all(), description='Best pokemon bot ever!', shard_count = 1)
+bot.remove_command("help")
+bot.owner_ids = [859996173943177226, 551257232143024139, 552097487347777536]
 
 @bot.listen()
 async def on_ready():
-    print(f"{bot.user} is ready!")
+    print("Logging in...")
+    await asyncio.sleep(3)
+    start = f"Logged in as {bot.user} with ID: {bot.user.id}\n----------\nServer count: {len(bot.guilds)}\n----------\nShard count: {bot.shard_count}"
+    print(start)
     bot.mongo = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URI)
     bot.db = bot.mongo["DATA"]
+    bot.pokedata = Document(bot.db, "pokedata")
     bot.command_usage = Document(bot.db, "command_usage")
     bot.prefixes = Document(bot.db, "prefixes")
 
@@ -88,8 +92,8 @@ for filename in os.listdir("./cogs"):
 bot.load_extension("jishaku")
 
 #help
-@bot.slash_command()
-async def help(ctx, command: str = None, category: str = None):
+@bot.slash_command(name = "help")
+async def slashhelp(ctx, command: str = None, category: str = None):
     helpEm = discord.Embed(title = "PikaPi's Help Menu", description = f"Do /help <command> to get more info abt that command and /help <category> to get more info about a category!", colour = 0x9CCFFF)
     helpEm.set_thumbnail(url = bot.user.display_avatar.url)
     helpEm.set_footer(icon_url = ctx.author.display_avatar.url, text = f"Requested by {ctx.author}")

@@ -20,11 +20,11 @@ class Catch(commands.Cog):
         if msg.guild is None:
             return
 
-        spawnper = random.randrange(1, 51)
+        spawnper = random.randrange(1, 5)
         
         prefix = "p!"
 
-        if spawnper == 15:
+        if spawnper == 3:
             pRange = random.randrange(1, 898)
             rarC = requests.get(f"https://pokeapi.co/api/v2/pokemon-species/{pRange}")
             pLegC = rarC.json()["is_legendary"]
@@ -56,7 +56,6 @@ class Catch(commands.Cog):
     @commands.command(aliases = ["c"])
     @commands.cooldown(1, 1, commands.BucketType.channel)
     async def catch(self, ctx, *, pokemon: str):
-        prefix = "p!"
         pokemon = pokemon.lower()
         pokemon = pokemon.replace(' ', '-')
 
@@ -70,44 +69,46 @@ class Catch(commands.Cog):
             await ctx.send("That's the wrong pokemon!")
             return
 
-        if pokemon == tbc:
-            with open("caught.json", "r") as f:
-                c = json.load(f)
 
-            if str(ctx.author.id) not in c:
-                await ctx.reply(f"You haven't started yet! Use `{prefix}start` to start!")
-                return
+        acc_check = await self.bot.pokedata.get_all()
+        checks = []
+        counter = 0
 
-            statReq = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon.lower()}")
-            nick = ""
-            count = 1
-            lvl = random.randrange(5, 21)
-            stats = statReq.json()["stats"]
-            hp_stat = int(stats[0]["base_stat"])
-            atk_stat = int(stats[1]["base_stat"])
-            df_stat = int(stats[2]["base_stat"])
-            spd_stat = int(stats[5]["base_stat"])
+        if not acc_check:
+            pass
 
-            with open("counter.json", "r") as g:
-                pcounter = json.load(g)
+        for i in acc_check:
+            checkdata = acc_check[counter]["_id"]
+            counter += 1
+            checks.append(checkdata)
 
-            count = count + int(pcounter["pokecounter"])
-            pcounter["pokecounter"] = count
+        if ctx.author.id not in checks:
+            return await ctx.send("You haven't started your journey yet! Please do `p!start` to start your journey!")
 
-            d = c[str(ctx.author.id)]
-            counter = len(d) + 1
-            statD = {"name": tbc.lower(), "perm_id": count, "nick": nick, "lvl": lvl, "hp": hp_stat, "atk": atk_stat, "df": df_stat, "spd": spd_stat}
-            pokeDict = {counter : statD}
-            c[str(ctx.author.id)].update(pokeDict)
+        statReq = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon.lower()}")
+        nick = ""
+        count = 1
+        lvl = random.randrange(5, 21)
+        stats = statReq.json()["stats"]
+        hp_stat = int(stats[0]["base_stat"])
+        atk_stat = int(stats[1]["base_stat"])
+        df_stat = int(stats[2]["base_stat"])
+        spd_stat = int(stats[5]["base_stat"])
 
-            with open("caught.json", "w") as f:
-                json.dump(c, f)
+        with open("counter.json", "r") as g:
+            pcounter = json.load(g)
 
-            with open("counter.json", "w") as g:
-                json.dump(pcounter, g, indent = 4)
+        count = count + int(pcounter["pokecounter"])
+        pcounter["pokecounter"] = count
 
-            await ctx.send(f"Congratulations {ctx.author.mention}! You caught a level **{lvl}** {tbc.capitalize()}")
-            uncaught.pop(f"{ctx.channel.id}")
+        with open("counter.json", "w") as g:
+            json.dump(pcounter, g, indent = 4)
+
+        statD = {"name": pokemon, "pNum": count, "lvl": lvl, "hp": hp_stat, "nick": nick, "atk": atk_stat, "df": df_stat, "spd": spd_stat}
+        await self.bot.pokedata.update_by_id({"_id": ctx.author.id, f"p{count}": {"stats": statD}})
+        tbc = tbc.replace("-", " ")
+        await ctx.send(f"Congratulations {ctx.author.mention}! You caught a level **{lvl}** {tbc.capitalize()}!")
+        uncaught.pop(f"{ctx.channel.id}")
 
 def setup(bot):
     bot.add_cog(Catch(bot))
