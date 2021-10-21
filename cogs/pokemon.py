@@ -1,4 +1,5 @@
 from discord.ext import commands
+from discord.commands import slash_command
 import discord
 import requests
 import json
@@ -9,14 +10,14 @@ class Pokedex(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name = "pokedex", aliases = ["d", "dex"])
-    async def pokedex(self, ctx, *, pokemon):
+    @slash_command(name = "pokedex", aliases = ["d", "dex"])
+    async def pokedex(self, ctx, pokemon):
         pokemon = pokemon.replace(" ", "-")
         resp = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon}")
         try:
             pname = resp.json()["name"].capitalize()
         except:
-            await ctx.send(f"Pokemon called **`{pokemon}`** doesn't exist!")
+            await ctx.respond(f"Pokemon called **`{pokemon}`** doesn't exist!")
             return
         pID = resp.json()["id"]
         pImg = f"https://raw.githubusercontent.com/poketwo/data/master/images/{pID}.png"
@@ -49,11 +50,12 @@ class Pokedex(commands.Cog):
         dexEm.add_field(name = "Types", value = f"{ptype1}\n{ptype2}\n{ptype3}\n{ptype4}", inline = False)
         dexEm.add_field(name = "Appearance", value = f"**Height**: {pheight}m\n**Weight**: {pweight}kg", inline = False)
         dexEm.set_image(url = pImg)
-        await ctx.send(embed = dexEm)
+        await ctx.respond(embed = dexEm)
 
-    @commands.command(name = "pokemon",aliases = ["p"])
+    @slash_command(name = "pokemon",aliases = ["p"])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def pokemon(self, ctx, member : discord.Member = None):
+        return await ctx.respond("Not ready for use!")
         if not member:
             member = ctx.author
         author_id = str(member.id)
@@ -62,7 +64,7 @@ class Pokedex(commands.Cog):
             caught = json.load(f)
 
         if author_id not in caught:
-            await ctx.reply(f"You haven't started yet! Use `p!start` to start!")
+            await ctx.respond(f"You haven't started yet! Use `/start` to start!")
             return
 
         pList = ""
@@ -81,11 +83,13 @@ class Pokedex(commands.Cog):
             pList += f"`{poke_id}` - **{poke_name.capitalize()}** - {poke_nick} Lvl. {poke_lvl}\n"
 
         pokEm.add_field(name = f"{member.name}'s Pokemon", value = f"{pList}")
-        await ctx.send(embed = pokEm)
+        await ctx.respond(embed = pokEm)
 
-    @commands.command(name = "nickname", aliases = ["nick"])
+    @slash_command(name = "nickname", aliases = ["nick"])
     @commands.cooldown(1, 1, commands.BucketType.default)
-    async def nick(self, ctx, pokemon_id: str, *, newnick: str = None):
+    async def nickname(self, ctx, pokemon_id: int, newnick: str = None):
+        """Give your pokemon a nickname!"""
+        return await ctx.respond("Not ready for use!")
         with open("caught.json", "r") as f:
             data = json.load(f)
 
@@ -114,7 +118,7 @@ class Pokedex(commands.Cog):
         with open("caught.json", "w") as f:
             json.dump(data, f, indent = 4)
 
-        await ctx.send(resp)
+        await ctx.respond(resp)
 
 def setup(bot):
     bot.add_cog(Pokedex(bot))

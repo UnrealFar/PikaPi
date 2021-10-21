@@ -1,4 +1,5 @@
 from discord.ext import commands
+from discord.commands import slash_command
 import discord
 import bot
 
@@ -22,7 +23,7 @@ class Misc(commands.Cog):
         else:
             await self.bot.command_usage.increment(ctx.command.qualified_name, "usage_count", 1)
 
-    @commands.command()
+    @slash_command()
     @commands.cooldown(1, 5, commands.BucketType.guild)
     async def usage(self, ctx):
         """Shows usage stats for PikaPi's commands!"""

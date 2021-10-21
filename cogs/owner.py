@@ -1,4 +1,5 @@
 from discord.ext import commands
+from discord.commands import slash_command
 import discord
 import json
 import asyncio
@@ -28,7 +29,7 @@ class Owner(commands.Cog):
             ternary = "enabled" if command.enabled else "disabled"
             await ctx.send(f"I have {ternary} **`{command.qualified_name}`**!")
 
-    @commands.command()
+    @slash_command()
     @commands.is_owner()
     async def reloadall(self, ctx):
         async with ctx.typing():
@@ -41,7 +42,7 @@ class Owner(commands.Cog):
                     except Exception as e:
                         await ctx.send(e)
                         return
-            await ctx.send("Done reloading all cogs :)")
+            await ctx.respond("Done reloading all cogs :)")
 
 def setup(bot):
     bot.add_cog(Owner(bot))

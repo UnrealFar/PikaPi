@@ -1,4 +1,5 @@
 from discord.ext import commands
+from discord.commands import slash_command
 import discord
 import os
 import json
@@ -11,8 +12,9 @@ class Start(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(description="Start your awesome journey!")
+    @slash_command()
     async def start(self, ctx):
+        """Start your awesome journey!"""
         em = discord.Embed(title="Welcome to Pikapi!", description=f"Pick a starter Pokemon with `p!pick <pokemon>`")
         em.add_field(name="GEN 1 (KANTO)", value="Bulbasaur · Charmander · Squirtle", inline=False)
         em.add_field(name="GEN 2 (JHOTO)", value="Chikorita · Cyndaquil · Totodile", inline=False)
@@ -24,8 +26,8 @@ class Start(commands.Cog):
         em.add_field(name="GEN 8 (GALAR)", value="Grookey · Scorbunny · Sobble", inline=False)
         await ctx.send(embed=em)
 
-    @commands.command()
-    async def pick(self, ctx, *, pokemon : str):
+    @slash_command()
+    async def pick(self, ctx, pokemon : str):
         if ctx.guild is None:
             return await ctx.send("You can pick your starter pokemon only in a guild!")
 
@@ -42,13 +44,13 @@ class Start(commands.Cog):
             checks.append(checkdata)
 
         if ctx.author.id in checks:
-            return await ctx.send("You have already started your journey! Please do `p!pokemon` to view your pokemon!")
+            return await ctx.respond(f"You have already started your journey! Please do `/pokemon` to view your pokemon!")
 
         with open("starters.json", "r+") as f:
             sdata = json.load(f)
                 
         if pokemon.lower() not in sdata:
-            return await ctx.reply(f"Sorry, but I couldn't find that starter pokemon. Try `p!start` to see the available starter pokemon's!")
+            return await ctx.respond(f"Sorry, but I couldn't find that starter pokemon. Try `p!start` to see the available starter pokemon's!")
 
         statReq = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon.lower()}")
         nick = "Starter"
@@ -73,7 +75,7 @@ class Start(commands.Cog):
         statD = {"name": pokemon, "pNum": count, "lvl": lvl, "hp": hp_stat, "nick": nick, "atk": atk_stat, "df": df_stat, "spd": spd_stat} 
         starterDict = {"_id": ctx.author.id, "p1": {"stats": statD}}
         await self.bot.pokedata.insert(starterDict)
-        await ctx.send(f"You have chosen {pokemon} as your starter pokemon!")
+        await ctx.respond(f"You have chosen {pokemon} as your starter pokemon!")
 
 def setup(bot):
     bot.add_cog(Start(bot))

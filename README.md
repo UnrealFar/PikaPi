@@ -18,7 +18,7 @@ This repository ("`PikaPi`") is where we develop the [PikaPi](https://top.gg/ser
 [PikaPi](https://github.com/ThePikaPi/PikaPi/) combines the World of Pokemon and your imagination, all inside Discord!
 
 PikaPi is updated frequently with new features and patches. You can invite our bot to your Discord server at [TopGG](https://top.gg/servers/871048037768790016).
-To invite the bot to your Discord server, join the PikaPi [Discord server](https://top.gg/servers/871048037768790016), and then go to the `#bot-commands` channel and type: `c!invite`. Click the invite link and login, and you will be able to invite the bot to any server of your choosing!
+To invite the bot to your Discord server, join the PikaPi [Discord server](https://top.gg/servers/871048037768790016), and then go to the `#bot-commands` channel and type: `c!invite`. Click the invite link and you will be able to invite the bot to any server of your choosing!
 
 ## Contributing
 
@@ -38,3 +38,7 @@ There are many ways in which you can add your help into our code, such as:
 Copyright (c) ThePikaPi. All rights reserved.
 
 Licensed under the [GNU GPLv3](LICENSE) license.
+
+## Note
+- I do not recommend you to manually host this bot with the source code.
+- If you do host it, I will not give you any help with it if you are not sure of what to do.

@@ -2,7 +2,7 @@ from discord.ext import commands
 import discord
 
 class Errors(commands.Cog):
-    """The description for Errors goes here."""
+    """Handles errors while executing commands!"""
 
     def __init__(self, bot):
         self.bot = bot
