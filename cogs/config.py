@@ -1,3 +1,4 @@
+from discord.commands import slash_command
 from discord.ext import commands
 import discord
 
@@ -6,7 +7,7 @@ class Config(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(
+    @slash_command(
         name = "prefix",
         aliases = ["setprefix", "serverprefix", "guildprefix"]
         )

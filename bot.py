@@ -7,6 +7,7 @@ import random
 import asyncio
 import motor.motor_asyncio
 from utils.mongo import Document
+from jishaku.help_command import MinimalEmbedPaginatorHelp
 from discord.ext.buttons import Paginator
 
 load_dotenv()
@@ -28,9 +29,25 @@ async def get_prefix(bot, message):
     except:
         return commands.when_mentioned_or(DEFAULT_PREFIX)(bot, message)
 
-bot = commands.AutoShardedBot(command_prefix = get_prefix,case_insensitive=True, activity=discord.Activity(type=discord.ActivityType.watching, name="Pokemon"), status=discord.Status.dnd, intents=discord.Intents.all(), description='Best pokemon bot ever!', shard_count = 1)
+class PikaPi(commands.AutoShardedBot):
+    def __init__(self):
+        super().__init__(
+            command_prefix = get_prefix,
+            case_insensitive = True,
+            activity = discord.Activity(
+                type = discord.ActivityType.watching,
+                name = f"pokemon!"
+                ),
+            status = discord.Status.dnd,
+            intents = discord.Intents.all(),
+            description = "Best Pokemon bot ever!",
+            shard_count = 1
+        )
+
+        self.owner_ids = [859996173943177226, 551257232143024139, 552097487347777536]
+
+bot = PikaPi()
 bot.remove_command("help")
-bot.owner_ids = [859996173943177226, 551257232143024139, 552097487347777536]
 
 @bot.listen()
 async def on_ready():
@@ -40,7 +57,7 @@ async def on_ready():
     print(start)
     bot.mongo = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URI)
     bot.db = bot.mongo["DATA"]
-    bot.pokedata = Document(bot.db, "pokedata")
+    bot.pokedata = Document(bot.db, "admin")
     bot.command_usage = Document(bot.db, "command_usage")
     bot.prefixes = Document(bot.db, "prefixes")
 
@@ -170,4 +187,5 @@ class Pag(Paginator):
         except:
             pass
 
+bot.help_command = MinimalEmbedPaginatorHelp()
 bot.run(TOKEN)

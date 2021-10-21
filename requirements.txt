@@ -6,3 +6,4 @@ git+https://github.com/TheFarGG/buttons
 jishaku
 PyNaCl
 requests
+aiohttp

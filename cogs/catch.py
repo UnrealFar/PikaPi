@@ -1,4 +1,5 @@
 from discord.ext import commands
+from discord.commands import slash_command, Option
 import discord
 import requests
 import random
@@ -53,20 +54,20 @@ class Catch(commands.Cog):
             em.set_image(url = pImg)
             await msg.channel.send(embed = em)
 
-    @commands.command(aliases = ["c"])
+    @slash_command(aliases = ["c"])
     @commands.cooldown(1, 1, commands.BucketType.channel)
-    async def catch(self, ctx, *, pokemon: str):
+    async def catch(self, ctx, pokemon: str):
         pokemon = pokemon.lower()
         pokemon = pokemon.replace(' ', '-')
 
         try:
             tbc = uncaught[f"{ctx.channel.id}"]
         except:
-            await ctx.reply("There are no wild pokemon! ||Please note that wild pokemon are reset on bot restart!||")
+            await ctx.respond("There are no wild pokemon! Please note that wild pokemon are reset on bot restart!")
             return
 
         if pokemon != tbc:
-            await ctx.send("That's the wrong pokemon!")
+            await ctx.respond("That's the wrong pokemon!")
             return
 
 
@@ -83,7 +84,7 @@ class Catch(commands.Cog):
             checks.append(checkdata)
 
         if ctx.author.id not in checks:
-            return await ctx.send("You haven't started your journey yet! Please do `p!start` to start your journey!")
+            return await ctx.respond("You haven't started your journey yet! Please do `p!start` to start your journey!")
 
         statReq = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon.lower()}")
         nick = ""
@@ -107,7 +108,7 @@ class Catch(commands.Cog):
         statD = {"name": pokemon, "pNum": count, "lvl": lvl, "hp": hp_stat, "nick": nick, "atk": atk_stat, "df": df_stat, "spd": spd_stat}
         await self.bot.pokedata.update_by_id({"_id": ctx.author.id, f"p{count}": {"stats": statD}})
         tbc = tbc.replace("-", " ")
-        await ctx.send(f"Congratulations {ctx.author.mention}! You caught a level **{lvl}** {tbc.capitalize()}!")
+        await ctx.respond(f"Congratulations {ctx.author.mention}! You caught a level **{lvl}** {tbc.capitalize()}!")
         uncaught.pop(f"{ctx.channel.id}")
 
 def setup(bot):
