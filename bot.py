@@ -9,6 +9,7 @@ import motor.motor_asyncio
 from utils.mongo import Document
 from jishaku.help_command import MinimalEmbedPaginatorHelp
 from discord.ext.buttons import Paginator
+import time
 
 load_dotenv()
 
@@ -157,9 +158,14 @@ async def slashhelp(ctx, command: str = None, category: str = None):
 async def slashping(ctx):
     """🏓 Shows PikaPi's ping"""
     bot_ping = round(bot.latency * 1000)
+    start_time = time.monotonic()
+    await bot.mongo.admin.command("ping")
+    end_time = time.monotonic()
+    db_ping = int((end_time - start_time) * 1000)
     pingEm = discord.Embed(title="Pong!", description="", colour = discord.Color.blurple())
-    pingEm.add_field(name="Bot Ping", value=f"🏓 {bot_ping}ms", inline=False)
-    await ctx.send(embed = pingEm)
+    pingEm.add_field(name = "Bot Ping", value = f"🏓 **{bot_ping} ms**", inline = False)
+    pingEm.add_field(name = "Database ping", value = f"🏓 **{db_ping} ms**")
+    await ctx.respond(embed = pingEm)
 
 class Confirm(discord.ui.View):
     def __init__(self):
