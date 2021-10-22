@@ -109,51 +109,7 @@ for filename in os.listdir("./cogs"):
         bot.load_extension(f"cogs.{filename[:-3]}")
 bot.load_extension("jishaku")
 
-#help
-@bot.slash_command(name = "help")
-async def slashhelp(ctx, command: str = None, category: str = None):
-    helpEm = discord.Embed(title = "PikaPi's Help Menu", description = f"Do /help <command> to get more info abt that command and /help <category> to get more info about a category!", colour = 0x9CCFFF)
-    helpEm.set_thumbnail(url = bot.user.display_avatar.url)
-    helpEm.set_footer(icon_url = ctx.author.display_avatar.url, text = f"Requested by {ctx.author}")
-
-    if command is None:
-        if category is None:
-            cogs_desc = ""
-            for cog in bot.cogs:
-                cogs_desc += f"`{cog}` {bot.cogs[cog].__doc__}\n"
-            helpEm.add_field(name = "Cogs", value = cogs_desc, inline=False)
-            await ctx.send(embed = helpEm)
-            return
-
-    if category:
-        if command:
-            await ctx.send("Sorry! You can only select either command or category!")
-        if not command:
-            try:
-                cogname = category.lower()
-                cogname = cogname.capitalize()
-                cog = bot.get_cog(name = f"{cogname}")
-                commands = cog.get_commands()
-            except:
-                await ctx.send(f"Cog called {cogname} was not found! Please do /help to view the list of available cogs!")
-                return
-            for cmd in commands:
-                helpEm.add_field(name = f"{cmd.name}", value = f"**Usage:** `p!{cmd.name} {cmd.signature}`")
-            await ctx.send(embed = helpEm)
-            return
-
-    if command:
-        if category is None:
-            try:
-                cmd = bot.get_command(name = f"{command}")
-            except:
-                await ctx.send(f"Sorry! That command wasn't found! Please do /help <cogname> to view the list of available commands each cog has!")
-                return
-            helpEm.add_field(name = f"Command: {cmd.name}", value = f"**Usage:** `p!{cmd.name} {cmd.signature}`")
-            await ctx.send(embed = helpEm)
-
 # latency
-
 @bot.slash_command(name = "ping")
 async def slashping(ctx):
     """🏓 Shows PikaPi's ping"""

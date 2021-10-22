@@ -22,8 +22,6 @@ class Catch(commands.Cog):
             return
 
         spawnper = random.randrange(1, 30)
-        
-        prefix = "p!"
 
         if spawnper == 3:
             pRange = random.randrange(1, 898)
@@ -50,7 +48,7 @@ class Catch(commands.Cog):
                 pass
             uncaught[f"{msg.channel.id}"] = f"{pName.lower()}"
 
-            em = discord.Embed(title = f"{fledStr}", description = f"Type `{prefix}catch <pokemon>` to catch it!")
+            em = discord.Embed(title = f"{fledStr}", description = f"Type `/catch <pokemon>` to catch it!")
             em.set_image(url = pImg)
             await msg.channel.send(embed = em)
 
@@ -72,19 +70,15 @@ class Catch(commands.Cog):
 
 
         acc_check = await self.bot.pokedata.get_all()
-        checks = []
-        counter = 0
-
-        if not acc_check:
-            pass
+        checks = False
 
         for i in acc_check:
-            checkdata = acc_check[counter]["_id"]
-            counter += 1
-            checks.append(checkdata)
+            checkdata = acc_check["_id"]
+            if checkdata is not None:
+                checks = True
 
-        if ctx.author.id not in checks:
-            return await ctx.respond("You haven't started your journey yet! Please do `p!start` to start your journey!")
+        if checkdata is None:
+            return await ctx.respond("You haven't started your journey yet! Please do `/start` to start your journey!")
 
         statReq = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon.lower()}")
         nick = ""

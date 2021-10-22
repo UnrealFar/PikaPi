@@ -2,6 +2,7 @@ from discord.ext import commands
 from discord.commands import slash_command
 import discord
 import requests
+import jishaku
 import json
 
 class Pokedex(commands.Cog):
@@ -55,35 +56,40 @@ class Pokedex(commands.Cog):
     @slash_command(name = "pokemon",aliases = ["p"])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def pokemon(self, ctx, member : discord.Member = None):
-        return await ctx.respond("Not ready for use!")
         if not member:
             member = ctx.author
-        author_id = str(member.id)
+        author_id = member.id
 
-        with open("caught.json", "r") as f:
-            caught = json.load(f)
+        acc_check = await self.bot.pokedata.get_all()
+        data = None
 
-        if author_id not in caught:
-            await ctx.respond(f"You haven't started yet! Use `/start` to start!")
-            return
+        for account in acc_check:
+            if account["_id"] == author_id:
+                d = account
+                data = []
+                for p in d:
+                    data.append(account[p])
 
-        pList = ""
+        if data is None:
+            return await ctx.respond("You haven't started your journey yet! Please do `/start` to start your journey!")
+
+        pList = commands.Paginator(prefix = "", suffix = "")
         counter = 0
-        user_pokes = caught[str(author_id)]
+        user_pokes = list(data)[1:]
         pokEm = discord.Embed(colour = discord.Colour.red())
         pokEm.set_thumbnail(url = member.display_avatar.url)
 
         for poke in user_pokes:
             counter += 1
             poke_id = counter
-            poke_s = user_pokes[str(counter)]
-            poke_name = poke_s["name"].capitalize()
+            poke_s = user_pokes[counter - 1]["stats"]
+            poke_name = poke_s["name"]
             poke_nick = poke_s["nick"]
             poke_lvl = poke_s["lvl"]
-            pList += f"`{poke_id}` - **{poke_name.capitalize()}** - {poke_nick} Lvl. {poke_lvl}\n"
+            pList.add_line(f"`{poke_id}` - **{poke_name.capitalize()}** - {poke_nick} Lvl. {poke_lvl}\n")
 
-        pokEm.add_field(name = f"{member.name}'s Pokemon", value = f"{pList}")
-        await ctx.respond(embed = pokEm)
+        interface = jishaku.paginators.PaginatorEmbedInterface(ctx.bot, pList, owner = ctx.author)
+        await interface.send_to(ctx)
 
     @slash_command(name = "nickname", aliases = ["nick"])
     @commands.cooldown(1, 1, commands.BucketType.default)
@@ -94,7 +100,7 @@ class Pokedex(commands.Cog):
             data = json.load(f)
 
         if str(ctx.author.id) not in data:
-            await ctx.send(f"You haven't started yet! Please use p!start to start your journey with us!")
+            await ctx.send(f"You haven't started yet! Please use `/start` to start your journey with us!")
             return
 
         try:
