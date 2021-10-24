@@ -57,6 +57,7 @@ class Catch(commands.Cog):
     async def catch(self, ctx, pokemon: str):
         pokemon = pokemon.lower()
         pokemon = pokemon.replace(' ', '-')
+        author_id = ctx.author.id
 
         try:
             tbc = uncaught[f"{ctx.channel.id}"]
@@ -70,14 +71,13 @@ class Catch(commands.Cog):
 
 
         acc_check = await self.bot.pokedata.get_all()
-        checks = False
+        checkdata = False
 
-        for i in acc_check:
-            checkdata = acc_check["_id"]
-            if checkdata is not None:
-                checks = True
+        for account in acc_check:
+            if account["_id"] == author_id:
+                checkdata = True
 
-        if checkdata is None:
+        if checkdata is False:
             return await ctx.respond("You haven't started your journey yet! Please do `/start` to start your journey!")
 
         statReq = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon.lower()}")
