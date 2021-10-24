@@ -7,7 +7,9 @@ We aim to provide you the best Pokemon experience ever!
 - Check out [Information](information.md) for more bot information!
 
 ## What's new?
-- Slash commands!
+- Catching pokemon!
+- Viewing your pokemon with an interactive menu!
+- Slash commands and buttons!
 
 ## What's coming?
 - Switching to PikaPi's own API!
