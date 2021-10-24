@@ -1,4 +1,4 @@
-# PikaPi Alpha Discord Bot
+# PikaPi Introduction
 
 [![Feature Requests](https://img.shields.io/github/issues/microsoft/vscode/feature-request.svg)](https://github.com/ThePikaPi/PikaPi/issues?q=is%3Aopen+is%3Aissue+label%3Afeature-request+sort%3Areactions-%2B1-desc)
 [![Bugs](https://img.shields.io/github/issues/ThePikaPi/PikaPi/bug.svg)](https://github.com/ThePikaPi/PikaPi/issues?utf8=✓&q=is%3Aissue+is%3Aopen+label%3Abug)
@@ -9,8 +9,8 @@ This repository ("`PikaPi`") is where we develop the [PikaPi](https://top.gg/ser
 
 ## PikaPi Alpha
 
-<p align="center">
-  <img alt="Our Bot!" src="https://images-ext-1.discordapp.net/external/Zks8EdVheL6ytgV_FjEiAVuGl1kfi8wnb6uNZ_M52n4/%3Fsize%3D1024/https/cdn.discordapp.com/avatars/871051341248737290/2c43a55c1321856793e82a8fe36ce745.png?width=100&height=100">
+<p allign = "center">
+    <img alt="Our Bot!" src="https://images-ext-1.discordapp.net/external/Zks8EdVheL6ytgV_FjEiAVuGl1kfi8wnb6uNZ_M52n4/%3Fsize%3D1024/https/cdn.discordapp.com/avatars/871051341248737290/2c43a55c1321856793e82a8fe36ce745.png?width=100&height=100">
 </p>
 
 [PikaPi](https://top.gg/servers/871048037768790016) is a distribution of the `PikaPi` repository with the bot being already available.
