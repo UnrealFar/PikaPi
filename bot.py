@@ -1,15 +1,17 @@
-import discord
-from discord.ext import commands, tasks
+import asyncio
 import json
 import os
-from dotenv import load_dotenv
 import random
-import asyncio
-import motor.motor_asyncio
-from utils.mongo import Document
-from jishaku.help_command import MinimalEmbedPaginatorHelp
-from discord.ext.buttons import Paginator
 import time
+
+import discord
+import motor.motor_asyncio
+from discord.ext import commands, tasks
+from discord.ext.buttons import Paginator
+from dotenv import load_dotenv
+from jishaku.help_command import MinimalEmbedPaginatorHelp
+
+from utils.mongo import Document
 
 load_dotenv()
 
