@@ -9,7 +9,7 @@ class Trading(commands.Cog):
         self.bot = bot
 
     @slash_command()
-    async def trade(self, ctx, member: discord.Member):
+    async def trade(self, ctx, member: discord.Member, items: str):
         return await ctx.respond("Not ready for use")
 
 def setup(bot):

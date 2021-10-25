@@ -24,7 +24,7 @@ class Start(commands.Cog):
         em.add_field(name="GEN 6 (KALOS)", value="Chespin · Fennekin · Froakie", inline=False)
         em.add_field(name="GEN 7 (ALOLA)", value="Rowlet · Litten · Popplio", inline=False)
         em.add_field(name="GEN 8 (GALAR)", value="Grookey · Scorbunny · Sobble", inline=False)
-        await ctx.send(embed=em)
+        await ctx.respond(embed=em)
 
     @slash_command()
     async def pick(self, ctx, pokemon : str):
