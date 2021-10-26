@@ -80,20 +80,6 @@ async def on_message(message):
 
         await message.channel.send(f"My prefix in this server is {prefix}")
 
-# Battle Command
-@bot.command()
-async def battle(ctx, member : discord.Member):
-    if not member.bot:
-        await ctx.reply("Command coming soon.")
-
-    else:
-        await ctx.reply("You cannot battle a bot!")
-
-for filename in os.listdir("./cogs"):
-    if filename.endswith(".py"):
-        bot.load_extension(f"cogs.{filename[:-3]}")
-bot.load_extension("jishaku")
-
 # latency
 @bot.slash_command(name = "ping")
 async def slashping(ctx):
