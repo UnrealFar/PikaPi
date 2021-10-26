@@ -5,7 +5,6 @@ from discord.commands import slash_command, Option
 class Economy(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.economy = self.bot.economy
 
     @slash_command(name = "balance")
     async def _balance(
@@ -18,16 +17,35 @@ class Economy(commands.Cog):
             default = "coins"
         )
     ):
-        account = await self.economy.find({"_id": ctx.author.id})
+        accounts = await self.bot.economy.get_all()
+        account = None
+        for accs in accounts:
+            if accs["_id"] == ctx.author.id:
+                account = accs
+                break
+
         if account is None:
-            acc = await self.bot.pokedata.find({"_id": ctx.author.id})
+            ta = await self.bot.pokedata.get_all()
+            acc = None
+            for acct in ta:
+                if acct["_id"] == ctx.author.id:
+                    acc = acct
+                    break
+
             if acc is None:
                 return await ctx.respond("You do not have an account! Please do `/start` to start your journey!")
-            await self.economy.insert({"_id": ctx.author.id, "coins": 100, "shards": 0})
-            account = await self.economy.find({"_id": ctx.author.id})
+            else:
+                await self.bot.economy.insert({"_id": ctx.author.id, "balance": {"coins": 100, "shards": 0}})
 
-        coins = account["coins"]
-        shards = account["shards"]
+        accounts = await self.bot.economy.get_all()
+        account = None
+        for accs in accounts:
+            if accs["_id"] == ctx.author.id:
+                account = accs
+                break
+
+        coins = account["balance"]["coins"]
+        shards = account["balance"]["shards"]
 
         balEm = discord.Embed(title = f"{ctx.author.name}'s balalnce")
         balEm.add_field(name = "Coins", value = coins, inline = False)
