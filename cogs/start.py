@@ -75,6 +75,8 @@ class Start(commands.Cog):
         statD = {"name": pokemon, "pNum": count, "lvl": lvl, "hp": hp_stat, "nick": nick, "atk": atk_stat, "df": df_stat, "spd": spd_stat} 
         starterDict = {"_id": ctx.author.id, "p1": {"stats": statD}}
         await self.bot.pokedata.insert(starterDict)
+        bal = {"_id": ctx.author.id, "coins": 100, "shards": 0}
+        await self.bot.economy.insert(bal)
         await ctx.respond(f"You have chosen {pokemon} as your starter pokemon!")
 
 def setup(bot):

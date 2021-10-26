@@ -101,8 +101,16 @@ class Catch(commands.Cog):
 
         statD = {"name": pokemon, "pNum": count, "lvl": lvl, "hp": hp_stat, "nick": nick, "atk": atk_stat, "df": df_stat, "spd": spd_stat}
         await self.bot.pokedata.update_by_id({"_id": ctx.author.id, f"p{count}": {"stats": statD}})
+        bal = await self.bot.economy.find({"_id": ctx.author.id})
+        if bal is None:
+            await self.bot.economy.insert({"_id": ctx.author.id, "coins": 130, "shards": 0})
+        elif bal:
+            old_coins = bal["coins"]
+            old_shards = bal["shards"]
+            newcoins = int(old_coins) + 30
+            await self.bot.economy.update_by_id({"_id": ctx.author.id, "coins": newcoins, "shards": old_shards})
         tbc = tbc.replace("-", " ")
-        await ctx.respond(f"Congratulations {ctx.author.mention}! You caught a level **{lvl}** {tbc.capitalize()}!")
+        await ctx.respond(f"Congratulations {ctx.author.mention}! You caught a level **{lvl}** {tbc.capitalize()}!\nAdded 30 coins to your balance!")
         uncaught.pop(f"{ctx.channel.id}")
 
 def setup(bot):

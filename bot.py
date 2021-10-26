@@ -34,6 +34,10 @@ async def get_prefix(bot, message):
 
 class PikaPi(commands.AutoShardedBot):
     def __init__(self):
+        self.initial_extensions = [
+            "cogs.catch", "cogs.config", "cogs.errors", "cogs.help", "cogs.misc", "cogs.owner", "cogs.pokemon", "cogs.trading", "cogs.start", "cogs.economy"
+        ]
+
         super().__init__(
             command_prefix = get_prefix,
             case_insensitive = True,
@@ -48,6 +52,15 @@ class PikaPi(commands.AutoShardedBot):
         )
 
         self.owner_ids = [859996173943177226, 551257232143024139, 552097487347777536]
+        self.mongo = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URI)
+        self.db = self.mongo["DATA"]
+        self.pokedata = Document(self.db, "pokedata")
+        self.command_usage = Document(self.db, "command_usage")
+        self.economy = Document(self.db, "economy")
+        self.prefixes = Document(self.db, "prefixes")
+
+        for extension in self.initial_extensions:
+            self.load_extension(extension)
 
 bot = PikaPi()
 bot.remove_command("help")
@@ -58,11 +71,6 @@ async def on_ready():
     await asyncio.sleep(3)
     start = f"Logged in as {bot.user} with ID: {bot.user.id}\n----------\nServer count: {len(bot.guilds)}\n----------\nShard count: {bot.shard_count}"
     print(start)
-    bot.mongo = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URI)
-    bot.db = bot.mongo["DATA"]
-    bot.pokedata = Document(bot.db, "admin")
-    bot.command_usage = Document(bot.db, "command_usage")
-    bot.prefixes = Document(bot.db, "prefixes")
 
 @bot.listen()
 async def on_message(message):
