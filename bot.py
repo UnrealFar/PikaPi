@@ -80,23 +80,6 @@ async def on_message(message):
 
         await message.channel.send(f"My prefix in this server is {prefix}")
 
-@bot.listen()
-async def on_guild_join(guild):
-    with open('prefixes.json', 'r') as f:
-        prefixes = json.load(f)
-    prefixes[str(guild.id)] = 'p!'
-    with open('prefixes.json', 'w') as f:
-        json.dump(prefixes, f, indent = 4)
-
-@bot.listen()
-async def on_guild_remove(guild):
-    try:
-        with open('prefixes.json', 'r') as f:
-            prefixes = json.load(f)
-            prefixes.pop(str(guild.id))
-    except:
-        return
-
 # Battle Command
 @bot.command()
 async def battle(ctx, member : discord.Member):
