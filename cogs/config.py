@@ -12,6 +12,7 @@ class Config(commands.Cog):
         aliases = ["setprefix", "serverprefix", "guildprefix"]
         )
     @commands.has_permissions(administrator = True)
+    @commands.cooldown(1, 10, commands.BucketType.guild)
     async def setprefix(self, ctx, newprefix: str = "p!"):
         """Change the bot's prefix for the guild!"""
         await self.bot.prefixes.upsert({"_id": ctx.guild.id, "prefix": newprefix})

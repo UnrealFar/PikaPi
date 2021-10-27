@@ -9,13 +9,7 @@ class Economy(commands.Cog):
     @slash_command(name = "balance")
     async def _balance(
         self, 
-        ctx,
-        currency: Option(
-            str,
-            "Choose the currency!",
-            choices = ["coins", "shards"],
-            default = "coins"
-        )
+        ctx
     ):
         accounts = await self.bot.economy.get_all()
         account = None
@@ -47,7 +41,11 @@ class Economy(commands.Cog):
         coins = account["balance"]["coins"]
         shards = account["balance"]["shards"]
 
-        balEm = discord.Embed(title = f"{ctx.author.name}'s balalnce")
+        balEm = discord.Embed(
+            title = f"{ctx.author.name}'s balalnce",
+            colour = discord.Colour.red()
+        )
+        balEm.set_thumbnail(url = ctx.author.display_avatar.url)
         balEm.add_field(name = "Coins", value = coins, inline = False)
         balEm.add_field(name = "Shards", value = shards)
 

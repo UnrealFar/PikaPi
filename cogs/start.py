@@ -15,7 +15,7 @@ class Start(commands.Cog):
     @slash_command()
     async def start(self, ctx):
         """Start your awesome journey!"""
-        em = discord.Embed(title="Welcome to Pikapi!", description=f"Pick a starter Pokemon with `p!pick <pokemon>`")
+        em = discord.Embed(title="Welcome to Pikapi!", description=f"Pick a starter Pokemon with `/pick <pokemon>`")
         em.add_field(name="GEN 1 (KANTO)", value="Bulbasaur · Charmander · Squirtle", inline=False)
         em.add_field(name="GEN 2 (JHOTO)", value="Chikorita · Cyndaquil · Totodile", inline=False)
         em.add_field(name="GEN 3 (HOENN)", value="Treecko · Torchic · Mudkip", inline=False)
@@ -50,7 +50,7 @@ class Start(commands.Cog):
             sdata = json.load(f)
                 
         if pokemon.lower() not in sdata:
-            return await ctx.respond(f"Sorry, but I couldn't find that starter pokemon. Try `p!start` to see the available starter pokemon's!")
+            return await ctx.respond(f"Sorry, but I couldn't find that starter pokemon. Try `/start` to see the available starter pokemon's!")
 
         statReq = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon.lower()}")
         nick = "Starter"
@@ -76,7 +76,7 @@ class Start(commands.Cog):
         starterDict = {"_id": ctx.author.id, "p1": {"stats": statD}}
         await self.bot.pokedata.insert(starterDict)
         bal = {"_id": ctx.author.id, "balance": {"coins": 100, "shards": 0}}
-        await self.bot.economy.insert(bal)
+        await self.bot.db["economy"].insert_one(bal)
         await ctx.respond(f"You have chosen {pokemon} as your starter pokemon!")
 
 def setup(bot):

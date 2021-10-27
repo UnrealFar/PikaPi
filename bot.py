@@ -90,6 +90,7 @@ async def on_message(message):
 
 # latency
 @bot.slash_command(name = "ping")
+@commands.cooldown(1, 30, commands.BucketType.user)
 async def slashping(ctx):
     """🏓 Shows PikaPi's ping"""
     bot_ping = round(bot.latency * 1000)

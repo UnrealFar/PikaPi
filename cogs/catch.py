@@ -101,14 +101,16 @@ class Catch(commands.Cog):
 
         statD = {"name": pokemon, "pNum": count, "lvl": lvl, "hp": hp_stat, "nick": nick, "atk": atk_stat, "df": df_stat, "spd": spd_stat}
         await self.bot.pokedata.update_by_id({"_id": ctx.author.id, f"p{count}": {"stats": statD}})
-        bal = await self.bot.economy.find({"_id": ctx.author.id})
+        bal = await self.bot.db["economy"].find_one({"_id": ctx.author.id})
         if bal is None:
             await self.bot.economy.insert({"_id": ctx.author.id, "balance": {"coins": 130, "shards": 0}})
-        elif bal:
-            old_bal = bal["balance"]["coins"]
+        if bal:
+            old_coins = bal["balance"]["coins"]
             old_shards = bal["balance"]["shards"]
-            new_bal = int(old_bal) + 30
-            await self.bot.economy.upsert({"_id": ctx.author.id, "balance": {"coins": new_bal, "shards": old_shards}})
+            new_coins = int(old_coins) + 30
+            _id = bal["_id"]
+            balance = {"balance": {"coins": new_coins, "shards": old_shards}}
+            await self.bot.db["economy"].update_one({"_id": _id}, {"$set": balance})
         tbc = tbc.replace("-", " ")
         await ctx.respond(f"Congratulations {ctx.author.mention}! You caught a level **{lvl}** {tbc.capitalize()}!\nAdded 30 coins to your balance!")
         uncaught.pop(f"{ctx.channel.id}")
