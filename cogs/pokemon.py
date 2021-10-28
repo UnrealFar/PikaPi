@@ -56,40 +56,37 @@ class Pokedex(commands.Cog):
     @slash_command(name = "pokemon",aliases = ["p"])
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def pokemon(self, ctx, member : discord.Member = None):
+        no_acc_m = f"{member} hasn't started their journey yet!"
         if not member:
             member = ctx.author
+            no_acc_m = "You haven't started your journey yet! Please do `/start` to start your journey!"
         author_id = member.id
 
-        acc_check = await self.bot.pokedata.get_all()
-        data = None
-
-        for account in acc_check:
-            if account["_id"] == author_id:
-                d = account
-                data = []
-                for p in d:
-                    data.append(account[p])
+        data = await self.bot.db["pokedata"].find_one({"_id": member.id})
 
         if data is None:
-            return await ctx.respond("You haven't started your journey yet! Please do `/start` to start your journey!")
+            return await ctx.respond(no_acc_m)
+
+        del data["_id"]
 
         pList = commands.Paginator(prefix = "", suffix = "", max_size = 350)
         counter = 0
-        user_pokes = list(data)[1:]
-        pokEm = discord.Embed(colour = discord.Colour.red())
-        pokEm.set_thumbnail(url = member.display_avatar.url)
+        user_pokes = data
+        d = list(data.keys())
 
-        for poke in user_pokes:
-            counter += 1
-            poke_id = counter
-            poke_s = user_pokes[counter - 1]["stats"]
+        for poke in d:
+            user_poke = user_pokes[poke]
+            poke_id = poke[1:]
+            poke_s = user_poke["stats"]
             poke_name = poke_s["name"]
             poke_nick = poke_s["nick"]
+            if poke_nick != "":
+                poke_nick = f'***"{poke_nick}"***  '
             poke_lvl = poke_s["lvl"]
             pList.add_line(f"`{poke_id}` - **{poke_name.capitalize()}** - {poke_nick} Lvl. {poke_lvl}\n")
 
-        pokeEm = discord.Embed(title = f"{ctx.author}'s pokemon!", colour = discord.Colour.green())
-        pokeEm.set_thumbnail(url = ctx.author.display_avatar.url)
+        pokeEm = discord.Embed(title = f"{member}'s pokemon!", colour = discord.Colour.green())
+        pokeEm.set_thumbnail(url = member.display_avatar.url)
         interface = jishaku.paginators.PaginatorEmbedInterface(ctx.bot, pList, owner = ctx.author, embed = pokeEm)
         await interface.send_to(ctx)
 
@@ -97,20 +94,18 @@ class Pokedex(commands.Cog):
     @commands.cooldown(1, 1, commands.BucketType.default)
     async def nickname(self, ctx, pokemon_id: int, newnick: str = None):
         """Give your pokemon a nickname!"""
-        return await ctx.respond("Not ready for use!")
-        with open("caught.json", "r") as f:
-            data = json.load(f)
 
-        if str(ctx.author.id) not in data:
-            await ctx.send(f"You haven't started yet! Please use `/start` to start your journey with us!")
-            return
+        data = await self.bot.db["pokedata"].find_one({"_id": ctx.author.id})
+
+        if data is None:
+            return await ctx.respond(f"You haven't started yet! Please use `/start` to start your journey with us!")
 
         try:
-            user_poke = data[str(ctx.author.id)][str(pokemon_id)]
-            poke_name = user_poke["name"]
-            poke_lvl = user_poke["lvl"]
+            user_poke = data[f"p{pokemon_id}"]
+            poke_name = user_poke["stats"]["name"]
+            poke_lvl = user_poke["stats"]["lvl"]
         except:
-            await ctx.send(f"Pokemon with ID {pokemon_id} wasn't found!")
+            await ctx.respond(f"Pokemon with ID {pokemon_id} wasn't found!")
             return
 
         if newnick is None:
@@ -121,10 +116,8 @@ class Pokedex(commands.Cog):
             new_nick = newnick
             resp = f"Your level {poke_lvl} **{poke_name}**'s nickname was changed to {newnick}"
         
-        data[str(ctx.author.id)][str(pokemon_id)]["nick"] = new_nick
-        
-        with open("caught.json", "w") as f:
-            json.dump(data, f, indent = 4)
+        data[f"p{pokemon_id}"]["stats"]["nick"] = new_nick
+        await self.bot.db["pokedata"].update_one({"_id": ctx.author.id}, {"$set": data})
 
         await ctx.respond(resp)
 

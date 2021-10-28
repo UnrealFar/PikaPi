@@ -29,7 +29,7 @@ class Errors(commands.Cog):
             return
         else:
             await ctx.send(error)
-            ctx.command.reset_cooldown
+            ctx.command.reset_cooldown(ctx)
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):

@@ -1,5 +1,5 @@
 from discord.ext import commands
-from discord.commands import slash_command
+from discord.commands import slash_command, Option
 import discord
 
 class Trading(commands.Cog):
@@ -9,7 +9,12 @@ class Trading(commands.Cog):
         self.bot = bot
 
     @slash_command()
-    async def trade(self, ctx, member: discord.Member, items: str):
+    async def trade(
+        self,
+        ctx,
+        member: discord.Member,
+        coins: Option(str, "Number of coins to trade!", required = False)
+    ):
         return await ctx.respond("Not ready for use")
 
 def setup(bot):
