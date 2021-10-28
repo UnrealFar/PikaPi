@@ -48,10 +48,6 @@ class Economy(commands.Cog):
     ):
         shopEm = discord.Embed(colour = discord.Colour.blue())
         shopEm.set_footer(text = f"Requested by {ctx.author}", icon_url = ctx.author.display_avatar.url)
-        account = self.bot.db["economy"].find_one({"_id": ctx.author.id})
-
-        if account is not None:
-            shopEm.set_author(f"{ctx.author}'s balance: {account['balance']['coins']}coins, {account['balance']['shards']}shards")
 
         if page is None:
             shopEm.title = "Shop"
@@ -67,11 +63,18 @@ class Economy(commands.Cog):
             pd = shop[page]["description"]
             shopEm.title = pn
             shopEm.description = pd
-            for item in shop[page]["items"]:
+            items = shop[page]["items"]
+            for item in items:
                 itemname = item
-                desc = item["description"]
-                cost = item["cost"]
-                shopEm.add_field(name = itemname, value = f"**Description:** *{desc}*\nCost: **{cost}**coins")
+                desc = items[item]["description"]
+                cost = items[item]["cost"]
+                price = cost[:-1]
+                cur = cost[-1]
+                if cur == "c":
+                    cur = "coins"
+                elif cur == "s":
+                    cur = "shards"
+                shopEm.add_field(name = itemname, value = f"**Description:** *{desc}*\nCost: **{price}** {cur}")
             
             return await ctx.respond(embed = shopEm)
 
