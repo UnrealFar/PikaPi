@@ -84,7 +84,10 @@ class Catch(commands.Cog):
         nick = ""
         count = 1
         lvl = random.randrange(5, 21)
-        stats = statReq.json()["stats"]
+        try:
+            stats = statReq.json()["stats"]
+        except:
+            return await ctx.respond(f"Pokemon called {pokemon} was not found!")
         hp_stat = int(stats[0]["base_stat"])
         atk_stat = int(stats[1]["base_stat"])
         df_stat = int(stats[2]["base_stat"])
@@ -107,13 +110,29 @@ class Catch(commands.Cog):
         if bal:
             old_coins = bal["balance"]["coins"]
             old_shards = bal["balance"]["shards"]
-            new_coins = int(old_coins) + 30
+            new_coins = int(old_coins) + 15
             _id = bal["_id"]
             balance = {"balance": {"coins": new_coins, "shards": old_shards}}
             await self.bot.db["economy"].update_one({"_id": _id}, {"$set": balance})
         tbc = tbc.replace("-", " ")
-        await ctx.respond(f"Congratulations {ctx.author.mention}! You caught a level **{lvl}** {tbc.capitalize()}!\nAdded 30 coins to your balance!")
+        await ctx.respond(f"Congratulations {ctx.author.mention}! You caught a level **{lvl}** {tbc.capitalize()}!\nAdded 15 coins to your balance!")
         uncaught.pop(f"{ctx.channel.id}")
+
+    @slash_command(name = "hint")
+    @commands.cooldown(1, 7, commands.BucketType.channel)
+    async def _hint(self, ctx):
+        """Get a hint of the pokemon that spawned!"""
+        try:
+            pokemonname = uncaught[f"{ctx.channel.id}"]
+        except:
+            return await ctx.respond("There are no wild pokemon!")
+        hint = ""
+        for letter in pokemonname:
+            if random.randint(0, 3) == 1:
+                hint += letter
+            else:
+                hint += "_"
+        await ctx.respond(f"The spawned pokemon is **`{hint}`**")
 
 def setup(bot):
     bot.add_cog(Catch(bot))

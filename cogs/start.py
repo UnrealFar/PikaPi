@@ -1,10 +1,13 @@
 from discord.ext import commands
-from discord.commands import slash_command
+from discord.commands import slash_command, Option
 import discord
 import os
 import json
 import random
 import requests
+
+with open("starters.json") as sf:
+    starters = json.load(sf)
 
 class Start(commands.Cog):
     """Start your amazing journey!"""
@@ -27,7 +30,16 @@ class Start(commands.Cog):
         await ctx.respond(embed=em)
 
     @slash_command()
-    async def pick(self, ctx, pokemon : str):
+    async def pick(
+        self,
+        ctx,
+        pokemon: Option(
+            str,
+            "Choose your starter pokemon!",
+            choices = starters,
+            required = True
+        )
+    ):
         if ctx.guild is None:
             return await ctx.send("You can pick your starter pokemon only in a guild!")
 
@@ -45,11 +57,8 @@ class Start(commands.Cog):
 
         if ctx.author.id in checks:
             return await ctx.respond(f"You have already started your journey! Please do `/pokemon` to view your pokemon!")
-
-        with open("starters.json", "r+") as f:
-            sdata = json.load(f)
                 
-        if pokemon.lower() not in sdata:
+        if pokemon.lower() not in starters:
             return await ctx.respond(f"Sorry, but I couldn't find that starter pokemon. Try `/start` to see the available starter pokemon's!")
 
         statReq = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon.lower()}")

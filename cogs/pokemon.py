@@ -73,7 +73,7 @@ class Pokedex(commands.Cog):
         if data is None:
             return await ctx.respond("You haven't started your journey yet! Please do `/start` to start your journey!")
 
-        pList = commands.Paginator(prefix = "", suffix = "")
+        pList = commands.Paginator(prefix = "", suffix = "", max_size = 350)
         counter = 0
         user_pokes = list(data)[1:]
         pokEm = discord.Embed(colour = discord.Colour.red())
@@ -88,7 +88,9 @@ class Pokedex(commands.Cog):
             poke_lvl = poke_s["lvl"]
             pList.add_line(f"`{poke_id}` - **{poke_name.capitalize()}** - {poke_nick} Lvl. {poke_lvl}\n")
 
-        interface = jishaku.paginators.PaginatorEmbedInterface(ctx.bot, pList, owner = ctx.author)
+        pokeEm = discord.Embed(title = f"{ctx.author}'s pokemon!", colour = discord.Colour.green())
+        pokeEm.set_thumbnail(url = ctx.author.display_avatar.url)
+        interface = jishaku.paginators.PaginatorEmbedInterface(ctx.bot, pList, owner = ctx.author, embed = pokeEm)
         await interface.send_to(ctx)
 
     @slash_command(name = "nickname", aliases = ["nick"])

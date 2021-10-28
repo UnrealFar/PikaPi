@@ -35,7 +35,7 @@ async def get_prefix(bot, message):
 class PikaPi(commands.AutoShardedBot):
     def __init__(self):
         self.initial_extensions = [
-            "cogs.catch", "cogs.config", "cogs.errors", "cogs.help", "cogs.misc", "cogs.owner", "cogs.pokemon", "cogs.trading", "cogs.start", "cogs.economy"
+            "cogs.catch", "cogs.config", "cogs.errors", "cogs.help", "cogs.misc", "cogs.owner", "cogs.pokemon", "cogs.trading", "cogs.start", "cogs.economy", "jishaku"
         ]
 
         super().__init__(
@@ -58,6 +58,7 @@ class PikaPi(commands.AutoShardedBot):
         self.command_usage = Document(self.db, "command_usage")
         self.economy = Document(self.db, "economy")
         self.prefixes = Document(self.db, "prefixes")
+        self.incense_dict = {} #This is the most probably the most important dict in the entire code 
 
         for extension in self.initial_extensions:
             self.load_extension(extension)

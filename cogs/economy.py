@@ -12,31 +12,17 @@ class Economy(commands.Cog):
         ctx
     ):
         accounts = await self.bot.economy.get_all()
-        account = None
-        for accs in accounts:
-            if accs["_id"] == ctx.author.id:
-                account = accs
-                break
+        account = self.bot.db["economy"].find_one({"_id": ctx.author.id})
 
         if account is None:
-            ta = await self.bot.pokedata.get_all()
-            acc = None
-            for acct in ta:
-                if acct["_id"] == ctx.author.id:
-                    acc = acct
-                    break
+            acc = await self.bot.db["pokedata"].find_one({"_id": ctx.author.id})
 
             if acc is None:
                 return await ctx.respond("You do not have an account! Please do `/start` to start your journey!")
             else:
                 await self.bot.economy.insert({"_id": ctx.author.id, "balance": {"coins": 100, "shards": 0}})
 
-        accounts = await self.bot.economy.get_all()
-        account = None
-        for accs in accounts:
-            if accs["_id"] == ctx.author.id:
-                account = accs
-                break
+        accounts = await self.bot.db["economy"].find_one({"_id": ctx.author.id})
 
         coins = account["balance"]["coins"]
         shards = account["balance"]["shards"]
