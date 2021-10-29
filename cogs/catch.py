@@ -5,6 +5,7 @@ import discord
 import requests
 import aiohttp
 import random
+import asyncio
 import io
 import json
 
@@ -32,7 +33,7 @@ class Catch(commands.Cog):
             pLegC = rarC.json()["is_legendary"]
             pMytC = rarC.json()["is_mythical"]
             lc = [1, 5]
-            mc = [1, 3]
+            mc = [1, 7]
             if pLegC == "true":
                 lc = random.choice(lc)
                 if lc != 3:
@@ -108,6 +109,7 @@ class Catch(commands.Cog):
 
         count = count + int(pcounter["pokecounter"])
         pcounter["pokecounter"] = count
+        pid = len(checkdata) - 1
 
         with open("counter.json", "w") as g:
             json.dump(pcounter, g, indent = 4)
