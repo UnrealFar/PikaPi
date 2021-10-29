@@ -2,7 +2,6 @@ from discord.ext import commands
 from discord.commands import slash_command, Option
 from discord.commands import commands as cmds
 import discord
-import requests
 import aiohttp
 import random
 import asyncio
@@ -29,9 +28,11 @@ class Catch(commands.Cog):
 
         if spawnper == 3:
             pRange = random.randrange(1, 898)
-            rarC = requests.get(f"https://pokeapi.co/api/v2/pokemon-species/{pRange}")
-            pLegC = rarC.json()["is_legendary"]
-            pMytC = rarC.json()["is_mythical"]
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f"https://pokeapi.co/api/v2/pokemon-species/{pRange}") as req:
+                    rarC = await req.json()
+            pLegC = rarC["is_legendary"]
+            pMytC = rarC["is_mythical"]
             lc = [1, 5]
             mc = [1, 7]
             if pLegC == "true":
