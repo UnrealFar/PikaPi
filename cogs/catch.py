@@ -8,14 +8,13 @@ import random
 import io
 import json
 
-uncaught = {}
-
 class Catch(commands.Cog):
     """Catch commands"""
 
     def __init__(self, bot):
         self.bot = bot
         self.cooldowns = {}
+        self.bot.uncaught = {}
 
     @commands.Cog.listener()
     async def on_message(self, msg):
@@ -53,10 +52,10 @@ class Catch(commands.Cog):
             fledStr = "A wild pokemon just appeared!"
             fledP = None
             try:
-                fledP = uncaught.pop(f"{msg.channel.id}")
+                fledP = self.bot.uncaught.pop(f"{msg.channel.id}")
             except:
                 pass
-            uncaught[f"{msg.channel.id}"] = f"{pName.lower()}"
+            self.bot.uncaught[f"{msg.channel.id}"] = f"{pName.lower()}"
 
             if fledP is not None:
                 fledStr = f"A wild {fledP} fled! A new wild pokemon has appeared!"
@@ -72,7 +71,7 @@ class Catch(commands.Cog):
         author_id = ctx.author.id
 
         try:
-            tbc = uncaught[f"{ctx.channel.id}"]
+            tbc = self.bot.uncaught[f"{ctx.channel.id}"]
         except:
             await ctx.respond("There are no wild pokemon! Please note that wild pokemon are reset on bot restart!")
             return
@@ -82,7 +81,7 @@ class Catch(commands.Cog):
             return
 
 
-        checkdata = await self.bot.pokedata.find_one({"_id": ctx.author.id})
+        checkdata = await self.bot.db["pokedata"].find_one({"_id": ctx.author.id})
 
         if not checkdata:
             return await ctx.respond("You haven't started your journey yet! Please do `/start` to start your journey!")
@@ -127,7 +126,7 @@ class Catch(commands.Cog):
             await self.bot.db["economy"].update_one({"_id": _id}, {"$set": balance})
         tbc = tbc.replace("-", " ")
         await ctx.respond(f"Congratulations {ctx.author.mention}! You caught a level **{lvl}** {tbc.capitalize()}!\nAdded 15 coins to your balance!")
-        uncaught.pop(f"{ctx.channel.id}")
+        self.bot.uncaught.pop(f"{ctx.channel.id}")
 
     @slash_command(name = "hint")
     async def _hint(self, ctx):
@@ -140,7 +139,7 @@ class Catch(commands.Cog):
         if cooldown_check is not None:
             return await ctx.respond("You are on a cooldown!")
         try:
-            pokemonname = uncaught[f"{ctx.channel.id}"]
+            pokemonname = self.bot.uncaught[f"{ctx.channel.id}"]
         except:
             return await ctx.respond("There are no wild pokemon!")
         hint = ""

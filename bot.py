@@ -35,7 +35,7 @@ async def get_prefix(bot, message):
 class PikaPi(commands.AutoShardedBot):
     def __init__(self):
         self.initial_extensions = [
-            "cogs.catch", "cogs.config", "cogs.errors", "cogs.help", "cogs.misc", "cogs.owner", "cogs.pokemon", "cogs.trading", "cogs.start", "cogs.economy", "jishaku"
+            "cogs.catch", "cogs.config", "cogs.errors", "cogs.help", "cogs.misc", "cogs.owner", "cogs.pokemon", "cogs.trading", "cogs.start", "cogs.economy", "cogs.incense", "jishaku"
         ]
 
         super().__init__(
