@@ -91,13 +91,15 @@ class Catch(commands.Cog):
         if len(checkdata) == 21:
             if ctx.author.id not in self.bot.owner_ids:
                 return await ctx.respond("You can catch only 20 pokemon! Please release a pokemon to catch another one!")
-
-        statReq = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon.lower()}")
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon.lower()}") as req:
+                statReq = await req.json()
         nick = ""
         count = 1
         lvl = random.randrange(5, 21)
         try:
-            stats = statReq.json()["stats"]
+            stats = statReq["stats"]
         except:
             return await ctx.respond(f"Pokemon called {pokemon} was not found!")
         hp_stat = int(stats[0]["base_stat"])
