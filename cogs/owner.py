@@ -1,10 +1,12 @@
 from discord.ext import commands
 from discord.commands import slash_command
+from discord.commands import commands as cmds
 import discord
 import json
 import asyncio
 import os
 import requests
+import random
 import bot
 
 class Owner(commands.Cog):
@@ -14,9 +16,10 @@ class Owner(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    @commands.is_owner()
     async def toggle(self, ctx, *, command):
         """Enables/Disables a command!"""
+        if ctx.author.id in self.bot.owner_ids:
+            return await ctx.respond("This command is not for you!")
         command = self.bot.get_command(command)
 
         if command is None:
@@ -31,23 +34,24 @@ class Owner(commands.Cog):
             await ctx.send(f"I have {ternary} **`{command.qualified_name}`**!")
 
     @slash_command()
-    @commands.is_owner()
     async def reloadall(self, ctx):
-        async with ctx.typing():
-            for ext in os.listdir("./cogs/"):
-                if ext.endswith(".py") and not ext.startswith("_"):
-                    try:
-                        self.bot.reload_extension(f"cogs.{ext[:-3]}")
-                        await ctx.send(f"Realoaded {ext[:-3]}!")
-                        await asyncio.sleep(1)
-                    except Exception as e:
-                        await ctx.send(e)
-                        return
-            await ctx.respond("Done reloading all cogs :)")
+        if ctx.author.id in self.bot.owner_ids:
+            return await ctx.respond("This command is not for you!")
+        for ext in os.listdir("./cogs/"):
+            if ext.endswith(".py") and not ext.startswith("_"):
+                try:
+                    self.bot.reload_extension(f"cogs.{ext[:-3]}")
+                    await ctx.send(f"Realoaded {ext[:-3]}!")
+                    await asyncio.sleep(1)
+                except Exception as e:
+                    await ctx.send(e)
+                    return
+        await ctx.respond("Done reloading all cogs :)")
 
     @slash_command()
-    @commands.is_owner()
-    async def give(self, ctx, member: discord.Member,  pokemon):
+    async def give(self, ctx, member: discord.Member, pokemon):
+        if ctx.author.id not in self.bot.owner_ids:
+            return await ctx.respond("This command is not for you!")
         check = await self.bot.db["pokedata"].find_one({"_id": member.id})
         if check is None:
             return await ctx.respond(f"{member.mention} does not have a PikaPi account!")
@@ -75,7 +79,7 @@ class Owner(commands.Cog):
 
         statD = {"name": pokemon, "pNum": count, "lvl": lvl, "hp": hp_stat, "nick": nick, "atk": atk_stat, "df": df_stat, "spd": spd_stat}
         await self.bot.pokedata.update_by_id({"_id": ctx.author.id, f"p{count}": {"stats": statD}})
-        await ctx.respond(f"Added a {pokemon} of level {level}")
+        await ctx.respond(f"Added a {pokemon} of level {lvl}")
 
 def setup(bot):
     bot.add_cog(Owner(bot))

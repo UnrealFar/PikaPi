@@ -11,7 +11,7 @@ class Errors(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
-            await ctx.message.add_reaction("⌛")
+            await msg.add_reaction("⌛")
             return
         if isinstance(error, commands.MissingPermissions):
             await ctx.send("You don't have permission to do dat!")
@@ -32,23 +32,8 @@ class Errors(commands.Cog):
             ctx.command.reset_cooldown(ctx)
 
     @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
-        if isinstance(error, cmds.CommandOnCooldown):
-            await ctx.respond("You are on a cooldown!")
-            return
-        if isinstance(error, cmds.MissingPermissions):
-            await ctx.respond("You don't have permission to do dat!")
-            return
-        if isinstance(error, cmds.BotMissingPermissions):
-            await ctx.respond("I don't have permission to do dat!")
-            return
-        if isinstance(error, cmds.NotOwner):
-            await ctx.respond("This is an owner only command!")
-            return
-        if isinstance(error, cmds.CommandNotFound):
-            return
-        else:
-            await ctx.respond(error)
+    async def on_application_command_error(self, ctx, error):
+        await ctx.respond(error)
 
 def setup(bot):
     bot.add_cog(Errors(bot))

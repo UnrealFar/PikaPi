@@ -1,8 +1,11 @@
 from discord.ext import commands
 from discord.commands import slash_command, Option
+from discord.commands import commands as cmds
 import discord
 import requests
+import aiohttp
 import random
+import io
 import json
 
 uncaught = {}
@@ -12,6 +15,7 @@ class Catch(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.cooldowns = {}
 
     @commands.Cog.listener()
     async def on_message(self, msg):
@@ -38,22 +42,30 @@ class Catch(commands.Cog):
                 mc = random.choice(mc)
                 if mc != 2:
                     return
-            req = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pRange}")
-            pName = req.json()["name"].capitalize()
-            pImg = f"https://raw.githubusercontent.com/poketwo/data/master/images/{pRange}.png"
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f"https://pokeapi.co/api/v2/pokemon/{pRange}") as req:
+                    req = await req.json()
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f"https://raw.githubusercontent.com/poketwo/data/master/images/{pRange}.png") as img_url:
+                    imgbytes = io.BytesIO(await img_url.content.read())
+            pName = req["name"].capitalize()
+            img = discord.File(imgbytes, filename = "pokemon.png")
             fledStr = "A wild pokemon just appeared!"
+            fledP = None
             try:
-                uncaught.pop(f"{msg.channel.id}")
+                fledP = uncaught.pop(f"{msg.channel.id}")
             except:
                 pass
             uncaught[f"{msg.channel.id}"] = f"{pName.lower()}"
 
-            em = discord.Embed(title = f"{fledStr}", description = f"Type `/catch <pokemon>` to catch it!")
-            em.set_image(url = pImg)
-            await msg.channel.send(embed = em)
+            if fledP is not None:
+                fledStr = f"A wild {fledP} fled! A new wild pokemon has appeared!"
 
-    @slash_command(aliases = ["c"])
-    @commands.cooldown(1, 1, commands.BucketType.channel)
+            em = discord.Embed(title = f"{fledStr}", description = f"Type `/catch <pokemon>` to catch it!")
+            em.set_image(url = "attachment://pokemon.png")
+            await msg.channel.send(file = img, embed = em)
+
+    @slash_command()
     async def catch(self, ctx, pokemon: str):
         pokemon = pokemon.lower()
         pokemon = pokemon.replace(' ', '-')
@@ -70,15 +82,14 @@ class Catch(commands.Cog):
             return
 
 
-        acc_check = await self.bot.pokedata.get_all()
-        checkdata = False
+        checkdata = await self.bot.pokedata.find_one({"_id": ctx.author.id})
 
-        for account in acc_check:
-            if account["_id"] == author_id:
-                checkdata = True
-
-        if checkdata is False:
+        if not checkdata:
             return await ctx.respond("You haven't started your journey yet! Please do `/start` to start your journey!")
+
+        if len(checkdata) == 21:
+            if ctx.author.id not in self.bot.owner_ids:
+                return await ctx.respond("You can catch only 20 pokemon! Please release a pokemon to catch another one!")
 
         statReq = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon.lower()}")
         nick = ""
@@ -119,9 +130,15 @@ class Catch(commands.Cog):
         uncaught.pop(f"{ctx.channel.id}")
 
     @slash_command(name = "hint")
-    @commands.cooldown(1, 7, commands.BucketType.channel)
     async def _hint(self, ctx):
         """Get a hint of the pokemon that spawned!"""
+        cooldown_check = None
+        try:
+            cooldown_check = self.cooldowns[ctx.channel.id]
+        except:
+            pass
+        if cooldown_check is not None:
+            return await ctx.respond("You are on a cooldown!")
         try:
             pokemonname = uncaught[f"{ctx.channel.id}"]
         except:
@@ -133,6 +150,12 @@ class Catch(commands.Cog):
             else:
                 hint += "_"
         await ctx.respond(f"The spawned pokemon is **`{hint}`**")
+        self.cooldowns[ctx.channel.id] = 7
+        await asyncio.sleep(7)
+        try:
+            del self.cooldowns[ctx.channel.id]
+        except:
+            pass
 
 def setup(bot):
     bot.add_cog(Catch(bot))
