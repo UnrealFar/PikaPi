@@ -1,0 +1,28 @@
+{
+    "Page 1": {
+        "name": "Shards",
+        "description": "Shop for buying and exchanging shards",
+        "items": {
+            "Shards": {
+                "cost": "100c",
+                "description": "Shards let you buy special items that can't be bought with normal coins!",
+                "max": "1000"
+            },
+            "Incense": {
+                "cost": "50s",
+                "description": "Incense spawn a pokemon every 30 seconds for an hour!",
+                "max": "1"
+            },
+            "Eggs": {
+                "cost": "10s",
+                "description": "An egg will give you a random normal pokemon!",
+                "max": "10"
+            },
+            "Redeem": {
+                "cost": "50s",
+                "description": "You can spawn a pokemon of your choice! Keep in mind that the stats are random!",
+                "max": "3"
+            }
+        }
+    }
+}

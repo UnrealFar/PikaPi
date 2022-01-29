@@ -1,0 +1,4 @@
+*.breakpoints
+*.replit
+data/*
+__pycache__/*
