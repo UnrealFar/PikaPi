@@ -11,7 +11,7 @@ from typing import (
 )
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from site import app
+from webserver import app
 
 MONGO_URI = os.environ.get("mongo_uri")
 
