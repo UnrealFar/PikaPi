@@ -26,13 +26,10 @@ class User:
         return True
 
     async def remove_pokemon(self, uid) -> bool:
-        data = await self.get_account_data()
-        if not data: return False
-        for p in data["pokemon"]:
-            if p.get("_id") == uid:
-                del data["pokemon"][p]
-                await self.bot.accounts.update_one({"_id": self.id}, {"$set": data})
-                return True
+        return await self.bot.accounts.update_one(
+            {"_id": self.id},
+            {"$unset": f"pokemon.{uid}"}
+        ) 
 
     async def get_account_data(self) -> dict:
         return await self.bot.accounts.find_one({"_id": self.id})

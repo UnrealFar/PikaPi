@@ -3,9 +3,9 @@ import numpy
 import random
 import math
 from helper import new_token
-import discord
+import discord, asyncio
 
-def gen_stats(base_stats, level, iv) -> dict:
+async def gen_stats(base_stats, level, iv) -> dict:
     ret = {}
     hp = (0.01 * (2 * float(base_stats["hp"]) + iv + 1) * level)
     ret["hp"] = math.floor(hp) + level + 10
@@ -15,10 +15,10 @@ def gen_stats(base_stats, level, iv) -> dict:
         ret[s] = x
     return x
 
-def gen_level() -> float:
+async def gen_level() -> float:
     return round(random.uniform(4.9, 39.9), 1)
 
-def gen_iv() -> float:
+async def gen_iv(loop) -> float:
     opts = {
         "a": (1.01, 7.74),
         "b": (4.45, 14.73),
@@ -31,9 +31,13 @@ def gen_iv() -> float:
         "j": (91.93, 96.1),
         "k": (95.01, 99.99)
     }
-    per = numpy.random.choice(
+    per = await loop.run_in_executor(
+        None,
+        numpy.random.choice,
         list(opts),
-        p = [
+        None,
+        True,
+        [
             0.0001, 0.0009, 0.009, 0.4, 0.5, 0.072, 0.012, 0.005, 0.0009, 0.0001
         ]
     )
@@ -54,7 +58,8 @@ class Pokemon:
         "appearance",
         "iv",
         "level",
-        "created"
+        "created",
+        "bot"
     )
 
     def __init__(
@@ -81,10 +86,11 @@ class Pokemon:
         self.iv: float = payload.pop("iv", None)
         self.level: float = payload.pop("level", None)
         self.created = payload.pop("created", discord.utils.utcnow())
+        self.bot = payload.pop("bot", None)
 
     def get_payload(self) -> dict:
         ret = {}
-        dont = ("base_stats", "id", "stats")
+        dont = ("base_stats", "id", "stats", "bot")
         for slot in self.__slots__:
             if slot not in dont:
                 if hasattr(self, slot):
@@ -99,13 +105,13 @@ class Pokemon:
         if "iv" in payload:
             iv = payload["iv"]
         else:
-            iv = gen_iv()
-            payload["iv"]
+            iv = await gen_iv(payload["bot"].loop)
+            payload["iv"] = iv
         if "level" in payload:
             lvl = payload["level"]
         else:
-            lvl = gen_level()
+            lvl = await gen_level()
             payload["level"] = lvl
-        payload["sstats"] = gen_stats(payload.get("stats"), lvl, iv)
+        payload["sstats"] = await gen_stats(payload.get("stats"), lvl, iv)
         return cls(payload)
         

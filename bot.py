@@ -4,7 +4,7 @@ import models
 import aiohttp
 import helper
 import random
-import os
+import os, io
 import json
 import numpy
 from typing import (
@@ -32,10 +32,11 @@ class PikaPi(commands.Bot):
 
         self.helper: helper = helper
         self.session: aiohttp.ClientSession = aiohttp.ClientSession(loop = self.loop)
-        with open("config.json", "r") as cf:
-            config = json.load(cf)
-            self.token = config.get("token", os.environ.get("token"))
-            self.mongo_uri = config.get("mongo_uri", os.environ.get("mongo_uri"))
+        self.token = os.environ.get("token")
+        self.mongo_uri = os.environ.get("mongo_uri")
+
+        # cache
+        self.uncaught = {}
 
         # Load our exts here
         self.load_extension("cogs.help")
@@ -96,18 +97,21 @@ class PikaPi(commands.Bot):
         if "rarity" not in kwargs:
             kwargs["rarity"] = numpy.random.choice(
                 ["normal", "leg", "myth", "ub"],
-                p = [0.9825, 0.001, 0.005, 0.0025]
+                p = [0.9925, 0.004, 0.001, 0.0025]
             )
-        poke = random.choice((i async for i in self.pokedata.find_one(kwargs)))
+
+        pl = [p async for p in self.pokedata.find(kwargs)]
+        poke = random.choice(pl)
         poke["bot"] = self
-        poke = await models.Pokemon.new_pokemon(poke)
+        poke = await models.Pokemon.new_pokemon(**poke)
 
         if not shiny:
             sh = {"t": True, "f": False}
             shiny = numpy.random.choice(
                 ["f", "t"], p = [0.999, 0.001]
             )
-        poke.shiny = sh[shiny]
+            poke.shiny = sh[shiny]
+        else: poke.shiny = True
         return poke
 
     def run(self):
@@ -124,9 +128,50 @@ class PikaPi(commands.Bot):
             )
         print(self.user, "is ready!")
 
-    async def process_commands(self, message: discord.Message):
-        ctx = await self.get_context(message, cls = helper.CommandContext)
-        await self.invoke(ctx)
+    async def on_message(self, msg: discord.Message):
+        await self.spawn_from_message(msg)
+        await self.process_commands(msg)
+
+    async def spawn_from_message(self, message: discord.Message):
+        if message.author.bot or (message.guild == None):
+            return
+        chance = numpy.random.choice(
+            ["t", "f"],
+            p = [0.05, 0.95]
+        )
+        if chance == "f":
+            return
+        poke = await self.spawn_pokemon()
+        if not poke: return
+        imgdata = await self.session.get(
+            f"https://raw.githubusercontent.com/poketwo/data/master/images/{poke.id}.png"
+        )
+        imgbytes = io.BytesIO(await imgdata.content.read())
+        img = discord.File(imgbytes, filename = "pokemon.png")
+        channel = message.channel
+        if channel.id in self.uncaught:
+            d = self.uncaught[channel.id]
+            t = f"The {d.names.get('en', d.slug).title()} has fled! A new wild pokemon has appeared!"
+        else:
+            t = "A wild pokemon has appeared!"
+        sendEm = discord.Embed(
+            title = t,
+            description = "Type /catch <pokemon> to catch it!",
+            colour = discord.Colour.og_blurple()
+        )
+        sendEm.set_image(url = "attachment://pokemon.png")
+        try:
+            await channel.send(
+                embed = sendEm,
+                file = img
+            )
+        except:
+            pass
+        else:
+            self.uncaught[channel.id] = poke
+
+    async def get_context(self, message: discord.Message, cls = None):
+        return await super().get_context(message, cls = helper.CommandContext)
 
     async def get_application_context(self, interaction: discord.Interaction):
         return await super().get_application_context(interaction, cls = helper.ApplicationContext)
