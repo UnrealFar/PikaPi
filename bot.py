@@ -32,7 +32,7 @@ class PikaPi(commands.Bot):
 
         self.helper: helper = helper
         self.session: aiohttp.ClientSession = aiohttp.ClientSession(loop = self.loop)
-        with open("comfig.json", "r") as cf:
+        with open("config.json", "r") as cf:
             config = json.load(cf)
             self.token = config.get("token", os.environ.get("token"))
             self.mongo_uri = config.get("mongo_uri", os.environ.get("mongo_uri"))
