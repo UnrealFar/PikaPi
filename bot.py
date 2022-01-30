@@ -6,9 +6,12 @@ import helper
 import random
 import os
 import numpy
-from typing import Union
+from typing import (
+    Union
+)
 from motor.motor_asyncio import AsyncIOMotorClient
 
+from site import app
 
 MONGO_URI = os.environ.get("mongo_uri")
 
@@ -105,6 +108,14 @@ class PikaPi(commands.Bot):
         return poke
 
     async def on_ready(self):
+        if not hasattr(self, "site"):
+            self.site = app
+            self.loop.create_task(
+                app.run_task(
+                    host = "0.0.0.0",
+                    port = 8080
+                )
+            )
         print(self.user, "is ready!")
 
     async def process_commands(self, message: discord.Message):
