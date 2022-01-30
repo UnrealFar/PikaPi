@@ -8,11 +8,13 @@ PikaPi is a Discord based on Pokemon.
 > It is highly unrecommended to host the bot yourself.
 
 Now, if you still want to do it then follow the given steps.
-To run the bot yourself, create a .env file and fill in this information:
+To run the bot yourself, create a config.json file and fill in this information:
 
-```py
-token="<YOUR-BOT-TOKEN>"
-mongo_uri="<URI-OF-YOUR-MONGODB-CLUSTER>"
+```json
+{
+    "token": "<YOUR-BOT-TOKEN>",
+    "mongo_uri": "<URI-OF-YOUR-MONGODB-CLUSTER>"
+}
 ```
 **Note:**
 `You need to have all the pokemons' data stored in your mongo db cluster.

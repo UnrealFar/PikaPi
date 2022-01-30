@@ -5,6 +5,7 @@ import aiohttp
 import helper
 import random
 import os
+import json
 import numpy
 from typing import (
     Union
@@ -12,8 +13,6 @@ from typing import (
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from webserver import app
-
-MONGO_URI = os.environ.get("mongo_uri")
 
 class PikaPi(commands.Bot):
     r"""The bot object.
@@ -33,6 +32,10 @@ class PikaPi(commands.Bot):
 
         self.helper: helper = helper
         self.session: aiohttp.ClientSession = aiohttp.ClientSession(loop = self.loop)
+        with open("comfig.json", "r") as cf:
+            config = json.load(cf)
+            self.token = config.get("token", os.environ.get("token"))
+            self.mongo_uri = config.get("mongo_uri", os.environ.get("mongo_uri"))
 
         # Load our exts here
         self.load_extension("cogs.help")
@@ -44,7 +47,7 @@ class PikaPi(commands.Bot):
 
         # Database stuff
         db = dict()
-        self.mongo = AsyncIOMotorClient(MONGO_URI)
+        self.mongo = AsyncIOMotorClient(self.mongo_uri)
         metadata = self.mongo["METADATA"]
         userdata = self.mongo["USERDATA"]
         db["pokedata"] = helper.Mongo(metadata["pokemon"])
@@ -106,6 +109,9 @@ class PikaPi(commands.Bot):
             )
         poke.shiny = sh[shiny]
         return poke
+
+    def run(self):
+        super().run(self.token)
 
     async def on_ready(self):
         if not hasattr(self, "site"):
