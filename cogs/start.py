@@ -8,8 +8,7 @@ class Start(commands.Cog):
         self.bot: commands.Bot = bot
 
     @discord.commands.slash_command(
-        name = "start",
-        guild_ids = (873181946786762804,)
+        name = "start"
     )
     async def start(
         self,
@@ -24,8 +23,8 @@ class Start(commands.Cog):
         if acccheck:
             return await ctx.respond("You already have an account!")
 
+        s = await self.bot.new_pokemon({"slug": pokemon})
         acc = await self.bot.create_account(ctx.author)
-        s = await self.bot.fetch_pokemon(slug = pokemon)
         await acc.add_pokemon(s)
         return await ctx.respond(f"Congratulations! You have chosen {pokemon} as your partner!")
 

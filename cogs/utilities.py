@@ -4,13 +4,12 @@ import googletrans
 
 class Utilities(commands.Cog):
     def __init__(self, bot):
-        #Another useless typehint.
+
         self.bot: commands.Bot = bot
         self.translator: googletrans.Translator = googletrans.Translator()
 
     @discord.commands.slash_command(
         name = "translate",
-        guild_ids = (873181946786762804,)
     )
     async def translate(
         self,

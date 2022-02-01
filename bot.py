@@ -5,7 +5,6 @@ import aiohttp
 import helper
 import random
 import os, io
-import json
 import numpy
 from typing import (
     Union
@@ -13,6 +12,8 @@ from typing import (
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from webserver import app
+
+PIKAPI_GUILD_ID = 871048037768790016
 
 class PikaPi(commands.Bot):
     r"""The bot object.
@@ -28,7 +29,7 @@ class PikaPi(commands.Bot):
             )
         )
 
-        self.remove_command("help")
+        #self.remove_command("help")
 
         self.helper: helper = helper
         self.session: aiohttp.ClientSession = aiohttp.ClientSession(loop = self.loop)
@@ -43,18 +44,18 @@ class PikaPi(commands.Bot):
         self.load_extension("cogs.utilities")
         self.load_extension("cogs.start")
         self.load_extension("cogs.owner")
+        self.load_extension("cogs.catch")
+        self.load_extension("cogs.dex")
         self.load_extension("jishaku")
 
 
         # Database stuff
         db = dict()
-        self.mongo = AsyncIOMotorClient(self.mongo_uri)
-        metadata = self.mongo["METADATA"]
-        userdata = self.mongo["USERDATA"]
-        db["pokedata"] = helper.Mongo(metadata["pokemon"])
-        self.pokedata: helper.Mongo = db["pokedata"]
-        db["accounts"] = helper.Mongo(userdata["accounts"])
-        self.accounts: helper.Mongo = db["accounts"]
+        mongo = AsyncIOMotorClient(self.mongo_uri)
+        metadata = mongo["METADATA"]
+        userdata = mongo["USERDATA"]
+        self.pokedata: helper.Mongo = helper.Mongo(metadata["pokemon"])
+        self.accounts: helper.Mongo = helper.Mongo(userdata["accounts"])
         
         self.db: dict[str, helper.Mongo] = db
 
@@ -75,10 +76,13 @@ class PikaPi(commands.Bot):
     ) -> models.User:
         return await models.User.create_account(self, user.id)
 
-    async def get_pokemon(self, **kwargs) -> models.Pokemon:
-        return models.Pokemon(await self.pokedata.find_one(kwargs))
+    async def get_pokemon(self, kwargs) -> models.Pokemon:
+        d = await self.pokedata.find_one(kwargs)
+        if d:
+            d["bot"] = self
+            return models.Pokemon(d)
 
-    async def fetch_pokemon(self, **kwargs) -> models.Pokemon:
+    async def new_pokemon(self, kwargs) -> models.Pokemon:
         if "shiny" not in kwargs:
             sh = {"t": True, "f": False}
             shiny = numpy.random.choice(
@@ -126,7 +130,28 @@ class PikaPi(commands.Bot):
                     port = 8080
                 )
             )
+        if not hasattr(self, "loghook"):
+            self.loghook = discord.Webhook.from_url(
+                url = os.environ.get("loghook"),
+                session = self.session,
+                bot_token = self.token
+            )
         print(self.user, "is ready!")
+
+    async def on_guild_join(self, guild: discord.Guild):
+        try:
+            entries = await guild.audit_logs(
+                limit = 10,
+                action = discord.AuditLogAction.bot_add
+            ).flatten()
+        except:
+            return
+        for entry in entries:
+            if getattr(entry.target, "id", None) == self.user.id:
+                user = entry.user
+                acc = await self.get_account(user)
+                await acc.add_bal(coins = 1000, shards = 10)
+                break
 
     async def on_message(self, msg: discord.Message):
         await self.spawn_from_message(msg)
@@ -142,12 +167,9 @@ class PikaPi(commands.Bot):
         if chance == "f":
             return
         poke = await self.spawn_pokemon()
-        if not poke: return
-        imgdata = await self.session.get(
-            f"https://raw.githubusercontent.com/poketwo/data/master/images/{poke.id}.png"
-        )
-        imgbytes = io.BytesIO(await imgdata.content.read())
-        img = discord.File(imgbytes, filename = "pokemon.png")
+        if not poke:
+            return
+        img = await poke.get_image()
         channel = message.channel
         if channel.id in self.uncaught:
             d = self.uncaught[channel.id]

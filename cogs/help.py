@@ -25,7 +25,7 @@ class HelpCog(commands.Cog):
     @discord.commands.slash_command(
         name = "help",
         description = "PikaPi's help command!",
-        guild_ids = (873181946786762804,)
+        #guild_ids = (873181946786762804,)
     )
     async def help(
         self,
