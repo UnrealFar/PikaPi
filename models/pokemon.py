@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 import math, numpy, random, io
 from helper import new_token
 import discord, asyncio
@@ -71,19 +71,13 @@ class Pokemon:
         self.id: int = payload.pop("_id", None)
         self.dex: int = payload.pop("dex", None)
         self.slug: str = payload.pop("slug", None)
-        self.names: dict[str, str] = {
-            "en": payload.pop("name_en", None),
-            "ja": payload.pop("name_ja", None),
-            "jar": payload.pop("name_jar", None),
-            "de": payload.pop("name_de", None),
-            "fr": payload.pop("name_fr", None)
-        }
+        self.names: Dict[str, str] = payload.pop("names", {})
         self.types: List[str] = payload.pop("types", [])
         self.rarity: str = payload.pop("rarity", None)
         self.region: str = payload.pop("region", None)
-        self.appearance: dict[str, str] = payload.pop("appearance", None)
-        self.base_stats: dict = payload.pop("stats", None)
-        self.stats: dict = payload.pop("sstats", None)
+        self.appearance: Dict[str, str] = payload.pop("appearance", None)
+        self.base_stats: Dict = payload.pop("stats", None)
+        self.stats: Dict = payload.pop("sstats", None)
         self.shiny: bool = payload.pop("shiny", False)
         self.iv: float = payload.pop("iv", None)
         self.level: float = payload.pop("level", None)
@@ -96,30 +90,35 @@ class Pokemon:
         if "simg" in payload:
             self.simg = payload.pop("simg")
 
+    def __str__(self) -> str:
+        return self.names.get("en", self.slug).title()
+
     async def get_image(self) -> discord.File:
-        if not getattr(self, "img", None):
-            if not self.shiny:
+        if not self.shiny:
+            if not getattr(self, "img", None):
                 imgdata = await self.bot.session.get(
-                f"https://raw.githubusercontent.com/poketwo/data/master/images/{self.dex}.png"
-        )
+                    f"https://raw.githubusercontent.com/poketwo/data/master/images/{self.dex}.png"
+                )
             else:
-                imgdata = await self.bot.session.get(
-                f"https://raw.githubusercontent.com/poketwo/data/master/shiny/{self.dex}.png"
-            )
+                imgdata = await self.bot.session.get(self.img)
         else:
-            imgdata = await self.bot.session.get(self.img)
+            if not getattr(self, "simg", None):
+                imgdata = await self.bot.session.get(
+                    f"https://raw.githubusercontent.com/poketwo/data/master/shiny/{self.dex}.png"
+                )
+            else:
+                imgdata = await self.bot.session.get(self.simg)
         imgbytes = io.BytesIO(await imgdata.content.read())
         return discord.File(imgbytes, filename = "pokemon.png")
 
     def get_payload(self) -> dict:
         ret = {}
-        dont = ("base_stats", "_id", "stats", "bot", "simg")
+        dont = ("base_stats", "_id", "bot", "simg")
         for slot in self.__slots__:
             if slot not in dont:
                 if hasattr(self, slot):
                     ret[slot] = getattr(self, slot)
         ret["_id"] = self.id
-        ret["stats"] = self.stats
         ret["tk"] = new_token(self.id)
         if self.shiny:
             ret["img"] = self.simg

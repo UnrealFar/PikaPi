@@ -19,6 +19,7 @@ class Start(commands.Cog):
             choices = STARTER_POKEMON
         )
     ):
+        """Start your amazing PikaPi Journey!"""
         acccheck = await self.bot.get_account(ctx.author)
         if acccheck:
             return await ctx.respond("You already have an account!")

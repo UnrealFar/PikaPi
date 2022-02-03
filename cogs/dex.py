@@ -36,16 +36,16 @@ class Pokedex(commands.Cog):
             {
                 "$or": [
                     {"slug": pokemon},
-                    {"name_en": pokemon},
-                    {"name_ja": pokemon},
-                    {"name_fr": pokemon},
-                    {"name_de": pokemon},
-                    {"name_jar": pokemon}
+                    {"names.en": pokemon},
+                    {"names.ja": pokemon},
+                    {"names.fr": pokemon},
+                    {"names.de": pokemon},
+                    {"names.jar": pokemon}
                 ]
             }
         )
         if not poke:
-            return await ctx.respond("A Pokemon called {pokemom} was not found!")
+            return await ctx.respond(f"A Pokemon called {pokemon} was not found!")
         poke.shiny = sh
         title = poke.names.get("en", pokemon).title()
         if poke.shiny:
@@ -113,15 +113,15 @@ class Pokedex(commands.Cog):
         if ns.get("jar"):
             ret += f"{JA_FLAG} {ns.get('jar')}\n"
         else:
-            ret += f"{JA_FLAG} {ns.get('ja') if ns.get('ja') else ns.get('en')}"
+            ret += f"{JA_FLAG} {ns.get('ja') if ns.get('ja') else ns.get('en')}\n"
         if ns.get("de"):
             ret += f"{DE_FLAG} {ns.get('de')}\n"
         else:
             ret += f"{DE_FLAG} {ns.get('en')}\n"
         if ns.get("fr"):
-            ret += f"{FR_FLAG} {ns.get('fr')}"
+            ret += f"{FR_FLAG} {ns.get('fr')}\n"
         else:
-            ret += f"{FR_FLAG} {ns.get('en')}"
+            ret += f"{FR_FLAG} {ns.get('en')}\n"
         return ret.title()
 
 def setup(bot):

@@ -39,7 +39,7 @@ class Catch(commands.Cog):
             or
             (pokemon in (p for p in poke.names.values()))
         ):
-            desc = f"Congratulations! You have caught a {poke.names['en'].title()} of level **{round(poke.level)}**"
+            desc = f"Congratulations! You have caught a {poke.names.get('en', pokemon).title()} of level **{round(poke.level)}**"
             if poke.shiny:
                 desc += f"\n\nThese colours seem unusual... ✨✨"
             await acc.add_pokemon(poke)

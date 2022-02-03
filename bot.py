@@ -4,11 +4,9 @@ import models
 import aiohttp
 import helper
 import random
-import os, io
+import os
 import numpy
-from typing import (
-    Union
-)
+from typing import Union
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from webserver import app
@@ -21,7 +19,7 @@ class PikaPi(commands.Bot):
     def __init__(self):
         super().__init__(
             command_prefix = "p.",
-            owner_ids = (859996173943177226,),
+            owner_ids = (859996173943177226, 661508161529708564),
             allowed_mentions = discord.AllowedMentions(
                 roles = False,
                 everyone = False,
@@ -32,7 +30,6 @@ class PikaPi(commands.Bot):
         #self.remove_command("help")
 
         self.helper: helper = helper
-        self.session: aiohttp.ClientSession = aiohttp.ClientSession(loop = self.loop)
         self.token = os.environ.get("token")
         self.mongo_uri = os.environ.get("mongo_uri")
 
@@ -46,6 +43,7 @@ class PikaPi(commands.Bot):
         self.load_extension("cogs.owner")
         self.load_extension("cogs.catch")
         self.load_extension("cogs.dex")
+        self.load_extension("cogs.profile")
         self.load_extension("jishaku")
 
 
@@ -94,7 +92,7 @@ class PikaPi(commands.Bot):
         if not poke: return None
         poke["bot"] = self
         poke = await models.Pokemon.new_pokemon(**poke)
-        poke.shiny = shiny
+        poke.shiny = shiny if not getattr(poke, "shiny", None) else poke.shiny
         return poke
 
     async def spawn_pokemon(self, shiny = False, **kwargs) -> models.Pokemon:
@@ -115,13 +113,16 @@ class PikaPi(commands.Bot):
                 ["f", "t"], p = [0.999, 0.001]
             )
             poke.shiny = sh[shiny]
-        else: poke.shiny = True
+        else: 
+            poke.shiny = shiny
         return poke
 
     def run(self):
         super().run(self.token)
 
     async def on_ready(self):
+        if not hasattr(self, "session"):
+            self.session: aiohttp.ClientSession = aiohttp.ClientSession()
         if not hasattr(self, "site"):
             self.site = app
             self.loop.create_task(
@@ -146,12 +147,22 @@ class PikaPi(commands.Bot):
             ).flatten()
         except:
             return
-        for entry in entries:
-            if getattr(entry.target, "id", None) == self.user.id:
-                user = entry.user
-                acc = await self.get_account(user)
-                await acc.add_bal(coins = 1000, shards = 10)
+        entry = None
+        for en in entries:
+            if getattr(en.target, "id", None) == self.user.id:
+                entry = en
                 break
+
+        if not entry:
+            return
+        user = entry.user
+        acc = await self.get_account(user)
+        if acc:
+            await acc.add_bal(coins = 1000, shards = 10)
+        desc = f"I was added to the guild: {guild.name} by {user}!"
+        if acc:
+            desc += f"\nAdded 1000 coins and 10 shards to {user}"
+        await self.loghook.send(desc)
 
     async def on_message(self, msg: discord.Message):
         await self.spawn_from_message(msg)
@@ -160,10 +171,7 @@ class PikaPi(commands.Bot):
     async def spawn_from_message(self, message: discord.Message):
         if message.author.bot or (message.guild == None):
             return
-        chance = numpy.random.choice(
-            ["t", "f"],
-            p = [0.05, 0.95]
-        )
+        chance = numpy.random.choice(["t", "f"],p = [0.05, 0.95])
         if chance == "f":
             return
         poke = await self.spawn_pokemon()
@@ -176,17 +184,10 @@ class PikaPi(commands.Bot):
             t = f"The {d.names.get('en', d.slug).title()} has fled! A new wild pokemon has appeared!"
         else:
             t = "A wild pokemon has appeared!"
-        sendEm = discord.Embed(
-            title = t,
-            description = "Type /catch <pokemon> to catch it!",
-            colour = discord.Colour.og_blurple()
-        )
+        sendEm = discord.Embed(title = t,description = "Type /catch <pokemon> to catch it!",colour = discord.Colour.og_blurple())
         sendEm.set_image(url = "attachment://pokemon.png")
         try:
-            await channel.send(
-                embed = sendEm,
-                file = img
-            )
+            await channel.send(embed = sendEm,file = img)
         except:
             pass
         else:
@@ -200,3 +201,4 @@ class PikaPi(commands.Bot):
 
     # Blacklist related stuff to be added later
 
+PikaPi().run()

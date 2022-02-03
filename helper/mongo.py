@@ -10,5 +10,6 @@ class Mongo:
         self.find = db.find
         self.insert_one = db.insert_one
         self.update_one = db.update_one
+        self.remove = db.delete_one
 
 
