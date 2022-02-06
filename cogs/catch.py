@@ -34,14 +34,10 @@ class Catch(commands.Cog):
                 "No wild Pokemon have spawned in this channel! Please note that wild Pokemon are reset on bot restart!"
             )
 
-        if (
-            (poke.slug.lower() == pokemon)
-            or
-            (pokemon in (p for p in poke.names.values()))
-        ):
+        if poke.slug.lower() == pokemon or pokemon in iter(poke.names.values()):
             desc = f"Congratulations! You have caught a {poke.names.get('en', pokemon).title()} of level **{round(poke.level)}**"
             if poke.shiny:
-                desc += f"\n\nThese colours seem unusual... ✨✨"
+                desc += '\n\nThese colours seem unusual... ✨✨'
             await acc.add_pokemon(poke)
             success = discord.Embed(
                 title = "New Catch!",
@@ -65,9 +61,11 @@ class Catch(commands.Cog):
         poke = self.bot.uncaught.get(ctx.channel.id)
         if not poke:
             return await ctx.respond("There are no wild Pokemon in this channel!")
-        ret = ""
-        for char in poke.names.get('en'):
-            ret += char if random.choice((False, True, False)) == True else "_"
+        ret = "".join(
+            char if random.choice((False, True, False)) == True else "_"
+            for char in poke.names.get('en')
+        )
+
         await ctx.respond(f"`{ret}`")
         self.hint_cooldown.append(ctx.channel.id)
         await asyncio.sleep(7)
