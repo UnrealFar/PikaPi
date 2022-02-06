@@ -1,6 +1,7 @@
-git+https://github.com/Pycord-Development/Pycord
+py-cord==2.0.0b1
 git+https://github.com/Sengolda/Jishkucord
 googletrans==4.0.0rc1
 dnspython
 motor
 quart
+PycordUtils

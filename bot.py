@@ -1,7 +1,7 @@
-import discord
+import discord, PycordUtils
 from discord.ext import commands
 import models
-import aiohttp
+import aiohttp, asyncio
 import helper
 import random
 import os
@@ -16,6 +16,9 @@ PIKAPI_GUILD_ID = 871048037768790016
 class PikaPi(commands.Bot):
     r"""The bot object.
     """
+
+    helper = helper
+
     def __init__(self):
         super().__init__(
             command_prefix = "p.",
@@ -29,12 +32,12 @@ class PikaPi(commands.Bot):
 
         #self.remove_command("help")
 
-        self.helper: helper = helper
         self.token = os.environ.get("token")
         self.mongo_uri = os.environ.get("mongo_uri")
 
         # cache
         self.uncaught = {}
+        self.tracker: PycordUtils.InviteTracker = PycordUtils.InviteTracker(self)
 
         # Load our exts here
         self.load_extension("cogs.help")
@@ -121,14 +124,17 @@ class PikaPi(commands.Bot):
         super().run(self.token)
 
     async def on_ready(self):
+        await self.tracker.cache_invites()
         if not hasattr(self, "session"):
             self.session: aiohttp.ClientSession = aiohttp.ClientSession()
         if not hasattr(self, "site"):
+            app.bot = self
             self.site = app
             self.loop.create_task(
                 app.run_task(
                     host = "0.0.0.0",
-                    port = 8080
+                    port = 8080,
+                    use_reloader = True
                 )
             )
         if not hasattr(self, "loghook"):
@@ -157,12 +163,49 @@ class PikaPi(commands.Bot):
             return
         user = entry.user
         acc = await self.get_account(user)
-        if acc:
-            await acc.add_bal(coins = 1000, shards = 10)
         desc = f"I was added to the guild: {guild.name} by {user}!"
         if acc:
+            await acc.add_bal(coins = 1000, shards = 5)
             desc += f"\nAdded 1000 coins and 10 shards to {user}"
-        await self.loghook.send(desc)
+        else:
+            desc += f"Couldn't reward {user} as they haven't registered yet :/"
+            await self.loghook.send(desc)
+
+    async def on_member_join(self, member: discord.Member):
+        if member.guild.id != PIKAPI_GUILD_ID:
+            return
+        inviter = await self.tracker.fetch_inviter(member)
+        acc = await self.get_account(inviter)
+        if acc:
+            await acc.add_bal(coins = 3000, shards = 10)
+            await self.loghook.send(f"Added 3k coins and 10 shards to {inviter}'s balance for joining the Main Server!")
+
+    async def on_vote(self, payload: dict):
+        uid = int(payload.pop("user"))
+
+        voter = await self.fetch_user(uid)
+
+        acc = await self.get_account(voter)
+
+        if acc:
+            await acc.add_bal(coins = 500, shards = 2)
+            await acc.vote()
+            em = discord.Embed(
+                title = "Thank You for voting!",
+                colour = discord.Colour.random()
+            )
+            try:
+                await voter.send(embed = em)
+            except:
+                pass
+            await self.loghook.send(f"{voter} has voted for the bot!")
+            async def reminder():
+                await asyncio.sleep(43200)
+                try:
+                    await voter.send("Your vote timer has refreshed! You can vote for PikaPi again at https://top.gg/bot/871051341248737290/vote")
+                except:
+                    return
+            self.loop.create_task(reminder())
 
     async def on_message(self, msg: discord.Message):
         await self.spawn_from_message(msg)

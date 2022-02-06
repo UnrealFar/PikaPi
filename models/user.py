@@ -12,6 +12,7 @@ class User:
         self.badges: List = payload.pop("badges", [])
         self.caught: dict = payload.pop("caught", {})
         self.bal: dict = payload.pop("bal", {})
+        self.votes: List = payload.pop("votes", [])
         self.__cached_users__[self.id] = self
 
     async def add_pokemon(self, pokemon: Pokemon) -> bool:
@@ -66,6 +67,15 @@ class User:
                 ret["bot"] = self.bot
                 return await Pokemon.new_pokemon(**ret)
 
+    async def vote(self):
+        votes = self.votes
+        t = discord.utils.utcnow()
+        votes.append(t)
+        return await self.bot.accounts.update_one(
+            {"_id": self.id},
+            {"$set": {"votes": votes}}
+            )
+
     async def get_account_data(self) -> dict:
         return await self.bot.accounts.find_one({"_id": self.id})
 
@@ -86,7 +96,8 @@ class User:
             "bal": {"c": 100, "s": 0},
             "badges": [],
             "caught": {"t": 0, "n": 0, "m": 0, "l": 0, "u": 0, "s": 0},
-            "pokemon": {}
+            "pokemon": {},
+            "votes": []
         }
         try:
             await db.insert_one(payload)
