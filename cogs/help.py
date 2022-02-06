@@ -64,18 +64,14 @@ class HelpCog(commands.Cog):
         command: discord.ApplicationCommand
     ):
         od = command._get_signature_parameters()
-        it = []
-        for i in od:
-            if (i != "self") and ("ctx" not in i):
-                it.append(i)
-        ret = f"/{command.name} {' '.join((f'<{e}>' for e in it))}"
-        return ret
+        it = [i for i in od if (i != "self") and ("ctx" not in i)]
+        return f"/{command.name} {' '.join((f'<{e}>' for e in it))}"
 
     async def get_all_cogs(self) -> List[commands.Cog]:
         return [v for k, v in self.bot.cogs]
 
     async def get_all_commands(self) -> List[discord.ApplicationCommand]:
-        return [cmd for cmd in self.bot.walk_application_commands()]
+        return list(self.bot.walk_application_commands())
     
 
 def setup(bot):

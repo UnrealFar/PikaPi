@@ -62,17 +62,16 @@ class User:
         ret = await self.get_account_data()
         if ret:
             ret = ret["pokemon"].get(str(pokemon_id))
-            if ret:
-                ret["bot"] = self.bot
-                return await Pokemon.new_pokemon(**ret)
+        if ret:
+            ret["bot"] = self.bot
+            return await Pokemon.new_pokemon(**ret)
 
     async def get_account_data(self) -> dict:
         return await self.bot.accounts.find_one({"_id": self.id})
 
     @classmethod
     def get_account(cls: "User", payload):
-        e = cls.__cached_users__.get(payload.get("_id"))
-        if e:
+        if e := cls.__cached_users__.get(payload.get("_id")):
             return e
         return cls(payload)
 

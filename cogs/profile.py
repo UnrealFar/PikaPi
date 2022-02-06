@@ -23,7 +23,7 @@ class Profile(commands.Cog):
         )
     ):
         """Get your's or another member's PikaPi profile!"""
-        user = user if user else ctx.author
+        user = user or ctx.author
         acc = await self.bot.get_account(user)
         if not acc:
             return await ctx.respond(f"{user} does not have an account!")

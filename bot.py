@@ -48,13 +48,13 @@ class PikaPi(commands.Bot):
 
 
         # Database stuff
-        db = dict()
+        db = {}
         mongo = AsyncIOMotorClient(self.mongo_uri)
         metadata = mongo["METADATA"]
         userdata = mongo["USERDATA"]
         self.pokedata: helper.Mongo = helper.Mongo(metadata["pokemon"])
         self.accounts: helper.Mongo = helper.Mongo(userdata["accounts"])
-        
+
         self.db: dict[str, helper.Mongo] = db
 
     async def get_account(
@@ -147,11 +147,14 @@ class PikaPi(commands.Bot):
             ).flatten()
         except:
             return
-        entry = None
-        for en in entries:
-            if getattr(en.target, "id", None) == self.user.id:
-                entry = en
-                break
+        entry = next(
+            (
+                en
+                for en in entries
+                if getattr(en.target, "id", None) == self.user.id
+            ),
+            None,
+        )
 
         if not entry:
             return
@@ -169,7 +172,7 @@ class PikaPi(commands.Bot):
         await self.process_commands(msg)
 
     async def spawn_from_message(self, message: discord.Message):
-        if message.author.bot or (message.guild == None):
+        if message.author.bot or message.guild is None:
             return
         chance = numpy.random.choice(["t", "f"],p = [0.05, 0.95])
         if chance == "f":

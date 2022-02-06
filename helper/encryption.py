@@ -4,5 +4,4 @@ def new_token(userid: int):
     u = str(base64.b64encode(str(userid).encode()))[2:-1]
     e = str(base64.b64encode(str().join(random.sample(string.ascii_letters, 4)).encode()))[2:-1]
     v = str(base64.b64encode(str(time.time()).encode()))[2:-1]
-    ret = ".".join([u, e, v])
-    return ret
+    return ".".join([u, e, v])

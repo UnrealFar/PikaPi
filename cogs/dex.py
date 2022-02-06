@@ -113,7 +113,7 @@ class Pokedex(commands.Cog):
         if ns.get("jar"):
             ret += f"{JA_FLAG} {ns.get('jar')}\n"
         else:
-            ret += f"{JA_FLAG} {ns.get('ja') if ns.get('ja') else ns.get('en')}\n"
+            ret += f'{JA_FLAG} {ns.get("ja") or ns.get("en")}\n'
         if ns.get("de"):
             ret += f"{DE_FLAG} {ns.get('de')}\n"
         else:
