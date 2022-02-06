@@ -4,9 +4,8 @@ from helper import new_token
 import discord, asyncio
 
 async def gen_stats(base_stats, level, iv) -> dict:
-    ret = {}
     hp = (0.01 * (2 * float(base_stats["hp"]) + iv + 1) * level)
-    ret["hp"] = math.floor(hp) + level + 10
+    ret = {'hp': math.floor(hp) + level + 10}
     for s in base_stats:
         x = (0.01 * (2 * float(base_stats[s]) + iv + 1) * level + 5)
         x = math.floor(x)
@@ -101,23 +100,23 @@ class Pokemon:
                 )
             else:
                 imgdata = await self.bot.session.get(self.img)
+        elif not getattr(self, "simg", None):
+            imgdata = await self.bot.session.get(
+                f"https://raw.githubusercontent.com/poketwo/data/master/shiny/{self.dex}.png"
+            )
         else:
-            if not getattr(self, "simg", None):
-                imgdata = await self.bot.session.get(
-                    f"https://raw.githubusercontent.com/poketwo/data/master/shiny/{self.dex}.png"
-                )
-            else:
-                imgdata = await self.bot.session.get(self.simg)
+            imgdata = await self.bot.session.get(self.simg)
         imgbytes = io.BytesIO(await imgdata.content.read())
         return discord.File(imgbytes, filename = "pokemon.png")
 
     def get_payload(self) -> dict:
-        ret = {}
         dont = ("base_stats", "_id", "bot", "simg")
-        for slot in self.__slots__:
-            if slot not in dont:
-                if hasattr(self, slot):
-                    ret[slot] = getattr(self, slot)
+        ret = {
+            slot: getattr(self, slot)
+            for slot in self.__slots__
+            if slot not in dont and hasattr(self, slot)
+        }
+
         ret["_id"] = self.id
         ret["tk"] = new_token(self.id)
         if self.shiny:
