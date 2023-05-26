@@ -1,0 +1,14 @@
+**.pyc
+db/*
+config.py
+*.log
+.breakpoints
+.cache
+.config
+.replit
+replit.nix
+.upm
+venv
+species_backup.json
+blacklist.json
+.github # will add later
