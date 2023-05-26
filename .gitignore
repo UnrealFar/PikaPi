@@ -11,4 +11,3 @@ replit.nix
 venv
 species_backup.json
 blacklist.json
-.github # will add later
